@@ -2,10 +2,14 @@ import CardsAds from "@components/CardsAds";
 import Header from "@components/Header";
 import MyAdsSummaryCard from "@components/MyAdsSummaryCard";
 import SearchFilter from "@components/SearchFilter";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AppAuthStackRoutes } from "@routes/app.auth.routes";
 import { currentHeight } from "@utils/responsive";
 import { FlatList, SafeAreaView, Text } from "react-native";
 
 export default function Home() {
+  const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
 
   const data = [
     {
@@ -70,7 +74,7 @@ export default function Home() {
         renderItem={
           ({ item }) => (
             <CardsAds
-              onPress={() => { }}
+              onPress={() => navigation.navigate("adetails")}
               title={item.title}
               price={item.price}
               isUsed={item.isUsed}
