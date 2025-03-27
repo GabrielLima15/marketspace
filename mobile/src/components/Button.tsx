@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, TouchableOpacityProps } from "react-native";
+import { Text, TouchableOpacity, TouchableOpacityProps, View } from "react-native";
 import Loading from "./Loading";
 
 type Props = TouchableOpacityProps & {
@@ -6,6 +6,7 @@ type Props = TouchableOpacityProps & {
   color: "primary" | "gray" | "dark";
   isLoading?: boolean;
   submit?: () => void;
+  icon?: React.ReactNode;
 };
 
 const colors = {
@@ -20,18 +21,30 @@ const textColors = {
   dark: "text-white",
 };
 
-export default function Button({ title, color, isLoading, submit, ...rest }: Props) {
+export default function Button({
+  title,
+  color,
+  isLoading,
+  submit,
+  icon,
+  ...rest
+}: Props) {
   return (
     <TouchableOpacity
       onPress={submit}
       {...rest}
-      className={`${colors[color]} rounded-md items-center justify-center h-12`}
+      className={`${colors[color]} rounded-md items-center justify-center h-12 px-4`}
       disabled={isLoading}
     >
       {isLoading ? (
         <Loading size="small" />
       ) : (
-        <Text className={`${textColors[color]} font-bold font-karla text-sm`}>{title}</Text>
+        <View className="flex-row items-center gap-x-2">
+          {icon && <View>{icon}</View>}
+          <Text className={`${textColors[color]} font-bold font-karla text-sm`}>
+            {title}
+          </Text>
+        </View>
       )}
     </TouchableOpacity>
   );

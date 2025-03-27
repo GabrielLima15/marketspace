@@ -1,45 +1,33 @@
-import { BottomTabNavigationProp, createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Home from "@screens/Auth/Home";
+import { House } from "phosphor-react-native";
+import { Host } from "react-native-portalize";
 
-
-
-type AppRoutes = {
-  homeStack: StackRoutes;
-  history: undefined;
-  profile: undefined;
-  exercise: undefined;
+export type AppRoutes = {
+  home: undefined
 }
 
-type StackRoutes = {
-  home: undefined;
-  exercise: { exerciseId: string };
-}
 
-export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRoutes>
-export type HomeNavigatorRoutesProps = BottomTabNavigationProp<StackRoutes>
-
-const Tab = createBottomTabNavigator<AppRoutes>();
-const Stack = createNativeStackNavigator<StackRoutes>();
-
-// function HomeStack() {
-//   return (
-//     <Stack.Navigator screenOptions={{ headerShown: false }}>
-
-//     </Stack.Navigator>
-//   )
-// }
+const Tab = createBottomTabNavigator<AppRoutes>()
 
 export function AuthRoutes() {
 
   return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarShowLabel: false,
-      }}
-    >
-
-    </Tab.Navigator>
+    <Host>
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      >
+        <Tab.Screen
+          name="home" component={Home} options={{
+            tabBarIcon: ({ color, size }) => <House size={size} color={color}
+            />
+          }}
+        />
+      </Tab.Navigator>
+    </Host>
   )
 }

@@ -1,6 +1,7 @@
 import { useAuth } from '@hooks/useAuth'
 import { NavigationContainer } from '@react-navigation/native'
 import { NoAuthRoutes } from './app.no.auth.routes'
+import { AuthRoutes } from './app.auth.routes'
 
 export default function AppRoutes() {
 
@@ -12,7 +13,7 @@ export default function AppRoutes() {
 
   return (
     <NavigationContainer>
-      {user.id ? <NoAuthRoutes /> : <NoAuthRoutes />}
+      {!user.id ? <AuthRoutes /> : <NoAuthRoutes />}
     </NavigationContainer>
   )
 }

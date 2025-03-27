@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Input from '@components/Input';
 import Button from '@components/Button';
 import UploadUserPhoto from '@components/UploadUserPhoto';
+import { DoRegister } from '@services/auth';
 
 const loginSchema = z.object({
   name: z.string().nonempty("Informe o nome").min(3, "O nome precisa ter pelo menos 3 caracteres"),
@@ -40,7 +41,14 @@ export default function Register() {
   async function handleRegister(data: FormDataProps) {
     try {
       setIsLoading(true);
-      console.log("Dados do Formulário:", data);
+
+      await DoRegister({
+        name: data.name,
+        email: data.email,
+        tel: data.tel,
+        password: data.password
+      });
+
     } catch (error) {
       console.error(error);
     } finally {
