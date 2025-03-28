@@ -16,7 +16,20 @@ export type AppAuthBottomTabRoutes = {
 // Stack
 export type AppAuthStackRoutes = {
   tabs: undefined;
-  adetails: undefined;
+  adetails: {
+    data: {
+      id: string;
+      title: string;
+      isUsed: boolean;
+      price: string;
+      image: string;
+      user: {
+        id: string;
+        avatar?: string;
+        name: string;
+      };
+    };
+  };
 };
 
 const Tab = createBottomTabNavigator<AppAuthBottomTabRoutes>();

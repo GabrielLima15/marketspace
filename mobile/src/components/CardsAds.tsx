@@ -2,14 +2,20 @@ import { Image, Text, TouchableOpacity, View } from "react-native"
 import User from '@assets/ads/user.svg'
 
 type Props = {
-  title?: string
-  price?: string
-  image?: string | null
-  isUsed?: boolean
+  product: {
+    title?: string
+    price?: string
+    image?: string | null
+    isUsed?: boolean
+  },
+  user: {
+    id: string
+    avatar?: string
+  }
   onPress: () => void
 }
 
-export default function CardsAds({ title, price, image, isUsed, onPress }: Props) {
+export default function CardsAds({ product: { title, price, image, isUsed }, user: { id, avatar }, onPress }: Props) {
   const condition = isUsed ? 'USADO' : 'NOVO'
 
   return (
@@ -23,7 +29,7 @@ export default function CardsAds({ title, price, image, isUsed, onPress }: Props
           />
 
           <View className="absolute w-full top-5 left-0 right-0 flex-row justify-between items-center p-2">
-            <User width={24} height={24} />
+            {avatar ? <Image source={{ uri: avatar }} className="w-8 h-8 rounded-full" /> : <User />}
 
             <View className={`${isUsed ? 'bg-black' : 'bg-product-blue'} px-3 py-1 rounded-full`}>
               <Text className="text-white text-[11px] font-bold uppercase">{condition}</Text>

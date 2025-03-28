@@ -1,61 +1,107 @@
 import CardsAds from "@components/CardsAds";
-import Header from "@components/Header";
+import HeaderGroup from "@components/HeaderGroup";
 import MyAdsSummaryCard from "@components/MyAdsSummaryCard";
 import SearchFilter from "@components/SearchFilter";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppAuthStackRoutes } from "@routes/app.auth.routes";
-import { currentHeight } from "@utils/responsive";
-import { FlatList, SafeAreaView, Text } from "react-native";
+import { FlatList, Text, View } from "react-native";
 
 export default function Home() {
   const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
 
-  const data = [
+  const products = [
     {
-      id: 1,
-      title: "Produto 1",
-      isUsed: true,
-      price: "50,00",
+      product: {
+        id: "1",
+        title: "Notebook Gamer",
+        isUsed: false,
+        price: "4.500,00",
+        image: "https://picsum.photos/id/180/600/400"
+      },
+      user: {
+        id: "1",
+        avatar: "https://github.com/gabriellima15.png",
+        name: "Gabriel Lima"
+      }
     },
     {
-      id: 2,
-      title: "Produto 2",
-      isUsed: false,
-      price: "50,00",
+      product: {
+        id: "2",
+        title: "Fone Over Ear",
+        isUsed: true,
+        price: "300,00",
+        image: "https://picsum.photos/id/237/600/400"
+      },
+      user: {
+        id: "2",
+        avatar: "https://github.com/gabriellima15.png",
+        name: "Gabriel Lima"
+      }
     },
     {
-      id: 3,
-      title: "Produto 3",
-      isUsed: false,
-      price: "50,00",
+      product: {
+        id: "3",
+        title: "Câmera DSLR Canon",
+        isUsed: true,
+        price: "2.000,00",
+        image: "https://picsum.photos/id/250/600/400"
+      },
+      user: {
+        id: "3",
+        avatar: "https://github.com/gabriellima15.png",
+        name: "Gabriel Lima"
+      }
     },
     {
-      id: 4,
-      title: "Produto 4",
-      isUsed: true,
-      price: "50,00",
+      product: {
+        id: "4",
+        title: "Tênis de Corrida Adidas",
+        isUsed: false,
+        price: "450,00",
+        image: "https://picsum.photos/id/1084/600/400"
+      },
+      user: {
+        id: "4",
+        avatar: "https://github.com/gabriellima15.png",
+        name: "Gabriel Lima"
+      }
     },
     {
-      id: 5,
-      title: "Produto 5",
-      isUsed: true,
-      price: "50,00",
+      product: {
+        id: "5",
+        title: "Relógio Digital Casio",
+        isUsed: true,
+        price: "120,00",
+        image: "https://picsum.photos/id/1027/600/400"
+      },
+      user: {
+        id: "5",
+        avatar: "https://github.com/gabriellima15.png",
+        name: "Gabriel Lima"
+      }
     },
     {
-      id: 6,
-      title: "Produto 5",
-      isUsed: false,
-      price: "50,00",
-    },
-  ]
+      product: {
+        id: "6",
+        title: "Tablet Samsung Galaxy",
+        isUsed: false,
+        price: "1.800,00",
+        image: "https://picsum.photos/id/1074/600/400"
+      },
+      user: {
+        id: "6",
+        avatar: "https://github.com/gabriellima15.png",
+        name: "Gabriel Lima"
+      }
+    }
+  ];
 
   return (
-    <SafeAreaView
+    <View
       className="flex-1 mx-8"
-      style={{ paddingTop: currentHeight }}
     >
-      <Header />
+      <HeaderGroup />
 
       <Text className="pt-8 text-base text-base-gray-3 font-karla font-normal leading-base">
         Seus produtos anunciados para venda
@@ -70,17 +116,26 @@ export default function Home() {
       <SearchFilter placeholder="Buscar anúncio" />
 
       <FlatList
-        data={data}
+        data={products}
         renderItem={
           ({ item }) => (
             <CardsAds
-              onPress={() => navigation.navigate("adetails")}
-              title={item.title}
-              price={item.price}
-              isUsed={item.isUsed}
+              key={item.product.id}
+              onPress={() =>
+                navigation.navigate("adetails", {
+                  data: {
+                    ...item.product,
+                    user: {
+                      ...item.user,
+                    }
+                  }
+                })
+              }
+              product={item.product}
+              user={item.user}
             />
           )}
-        keyExtractor={item => String(item.id)}
+        keyExtractor={item => item.product.id}
         numColumns={2}
         columnWrapperStyle={{
           gap: 8,
@@ -92,6 +147,6 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
       />
 
-    </SafeAreaView>
+    </View>
   )
 }

@@ -1,31 +1,49 @@
-import { useAuth } from "@hooks/useAuth";
-import { Plus } from "phosphor-react-native";
-import { Text, View } from "react-native";
-import Button from "./Button";
-import Avatar from "./Avatar";
+import { useNavigation } from "@react-navigation/native";
+import { ArrowLeft, PencilLine, Plus } from "phosphor-react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Header() {
-  const { user } = useAuth();
+type Props = {
+  back?: boolean
+  routeTitle?: boolean
+  title?: string
+  addAds?: boolean
+  editAds?: boolean
+}
+
+export default function Header({ back, routeTitle, title, addAds, editAds }: Props) {
+
+  const navigation = useNavigation();
+
+  const handleGoBack = () => {
+    navigation.goBack();
+  }
 
   return (
-    <View className="flex-row justify-between items-center mt-4">
-      <View className="flex-row items-center gap-2">
-        <Avatar />
+    <SafeAreaView className="px-4 flex-row w-full justify-between">
+      {back ? (
+        <TouchableOpacity onPress={handleGoBack}>
+          <ArrowLeft size={24} color="black" />
+        </TouchableOpacity>
+      ) : <View />}
 
-        <View>
-          <Text className="text-sm text-gray-500">Boas vindas,</Text>
-          <Text className="font-bold text-base">
-            {user?.name ? user.name : "Usuário"}!
-          </Text>
-        </View>
-      </View>
 
-      <Button
-        color="dark"
-        title="Criar anúncio"
-        className="px-4 py-2 rounded-md w-full"
-        icon={<Plus size={20} color="#fff" />}
-      />
-    </View>
-  );
+      {routeTitle ? (
+        <Text className="font-bold text-lg leading-base text-base-gray-1">{title}</Text>
+      ) : <View />}
+
+      {addAds ? (
+        <TouchableOpacity onPress={handleGoBack}>
+          <Plus size={24} color="black" />
+        </TouchableOpacity>
+      ) : editAds ? (
+        <TouchableOpacity onPress={handleGoBack}>
+          <PencilLine size={24} color="black" />
+        </TouchableOpacity>
+      ) : (
+        <View />
+      )}
+
+    </SafeAreaView>
+  )
 }
