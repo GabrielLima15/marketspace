@@ -12,7 +12,7 @@ type Props = {
     id: string
     avatar?: string
   }
-  onPress: () => void
+  onPress?: () => void
 }
 
 export default function CardsAds({ product: { title, price, image, isUsed }, user: { id, avatar }, onPress }: Props) {

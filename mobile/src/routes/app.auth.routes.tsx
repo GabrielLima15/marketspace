@@ -2,15 +2,17 @@
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { House } from "phosphor-react-native";
+import { House, Tag } from "phosphor-react-native";
 import { Host } from "react-native-portalize";
 
 import Home from "@screens/Auth/Home";
 import AdDetails from "@screens/Auth/AdDetails";
+import MyAds from "@screens/Auth/MyAds";
 
 // Tabs
 export type AppAuthBottomTabRoutes = {
   home: undefined;
+  myads: undefined;
 };
 
 // Stack
@@ -48,6 +50,13 @@ function BottomTabs() {
         component={Home}
         options={{
           tabBarIcon: ({ color, size }) => <House size={size} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="myads"
+        component={MyAds}
+        options={{
+          tabBarIcon: ({ color, size }) => <Tag size={size} color={color} />,
         }}
       />
     </Tab.Navigator>
