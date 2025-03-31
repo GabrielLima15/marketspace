@@ -2,13 +2,16 @@ import CardsAds from "@components/CardsAds";
 import Header from "@components/Header";
 import Select from "@components/Select";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AppAuthStackRoutes } from "@routes/app.auth.routes";
 import { useState } from "react";
 import { FlatList, Text, View } from "react-native";
 
 export default function MyAds() {
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
   const [filter, setFilter] = useState<string | undefined>();
+
 
   const allProducts = [
     {
@@ -133,6 +136,12 @@ export default function MyAds() {
           data={filteredProducts}
           renderItem={({ item }) => (
             <CardsAds
+              onPress={() =>
+                navigation.navigate("myadsdetails", {
+                  product: item.product,
+                  user: item.user
+                })
+              }
               isDisabled={item.product.isDisabled}
               key={item.product.id}
               product={item.product}

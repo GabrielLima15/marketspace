@@ -8,6 +8,7 @@ import { Host } from "react-native-portalize";
 import Home from "@screens/Auth/Home";
 import AdDetails from "@screens/Auth/AdDetails";
 import MyAds from "@screens/Auth/MyAds";
+import MyAdsDetails from "@screens/Auth/MyAdsDetails";
 
 // Tabs
 export type AppAuthBottomTabRoutes = {
@@ -31,6 +32,21 @@ export type AppAuthStackRoutes = {
         name: string;
       };
     };
+  };
+  myadsdetails: {
+    product: {
+      id: string
+      title: string
+      isUsed: boolean
+      price: string
+      image: string
+      isDisabled: boolean
+    },
+    user: {
+      id: string
+      avatar: string
+      name: string
+    }
   };
 };
 
@@ -69,6 +85,7 @@ export function AuthRoutes() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="tabs" component={BottomTabs} />
         <Stack.Screen name="adetails" component={AdDetails} />
+        <Stack.Screen name="myadsdetails" component={MyAdsDetails} />
       </Stack.Navigator>
     </Host>
   );
