@@ -104,8 +104,9 @@ export default function MyAds() {
   ];
 
   const filteredProducts = allProducts.filter((item) => {
-    if (filter === "Novos") return !item.product.isUsed;
-    if (filter === "Usados") return item.product.isUsed;
+    console.log("🚀 ~ filteredProducts ~ item:", item)
+    if (filter === "Ativos") return !item.product.isDisabled;
+    if (filter === "Inativos") return item.product.isDisabled;
     return true;
   });
 
@@ -120,7 +121,7 @@ export default function MyAds() {
 
           <Select
             title="Todos"
-            options={["Todos", "Novos", "Usados"]}
+            options={["Todos", "Inativos", "Ativos"]}
             value={filter}
             onSelect={(option) => {
               setFilter(option === "Todos" ? undefined : option);
