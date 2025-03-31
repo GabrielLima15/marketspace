@@ -10,6 +10,8 @@ import { FlatList, Text, View } from "react-native";
 export default function Home() {
   const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
 
+  const handleNavigateToAddAds = () => navigation.navigate("addads");
+
   const products = [
     {
       product: {
@@ -101,7 +103,7 @@ export default function Home() {
     <View
       className="flex-1 mx-8"
     >
-      <HeaderGroup />
+      <HeaderGroup onPress={handleNavigateToAddAds} />
 
       <Text className="pt-8 text-base text-base-gray-3 font-karla font-normal leading-base">
         Seus produtos anunciados para venda

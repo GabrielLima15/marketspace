@@ -9,6 +9,7 @@ import Home from "@screens/Auth/Home";
 import AdDetails from "@screens/Auth/AdDetails";
 import MyAds from "@screens/Auth/MyAds";
 import MyAdsDetails from "@screens/Auth/MyAdsDetails";
+import AddAds from "@screens/Auth/AddAds";
 
 // Tabs
 export type AppAuthBottomTabRoutes = {
@@ -48,6 +49,7 @@ export type AppAuthStackRoutes = {
       name: string
     }
   };
+  addads: undefined;
 };
 
 const Tab = createBottomTabNavigator<AppAuthBottomTabRoutes>();
@@ -86,6 +88,7 @@ export function AuthRoutes() {
         <Stack.Screen name="tabs" component={BottomTabs} />
         <Stack.Screen name="adetails" component={AdDetails} />
         <Stack.Screen name="myadsdetails" component={MyAdsDetails} />
+        <Stack.Screen name="addads" component={AddAds} />
       </Stack.Navigator>
     </Host>
   );

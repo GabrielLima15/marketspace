@@ -15,7 +15,7 @@ export default function App() {
   return (
     <GestureHandlerRootView className='flex-1'>
       <AuthContextProvider>
-        <StatusBar barStyle={'dark-content'} backgroundColor={'#fff'} translucent />
+        <StatusBar barStyle={'dark-content'} backgroundColor="transparent" translucent />
         {fontsLoaded ? <AppRoutes /> : <View />}
       </AuthContextProvider>
     </GestureHandlerRootView>

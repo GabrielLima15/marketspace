@@ -3,18 +3,15 @@ import { Plus } from "phosphor-react-native";
 import { Text, View } from "react-native";
 import Button from "./Button";
 import Avatar from "./Avatar";
-import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { currentHeight } from "@utils/responsive";
 
-export default function HeaderGroup() {
+type Props = {
+  onPress: () => void
+}
+
+export default function HeaderGroup({ onPress }: Props) {
   const { user } = useAuth();
-
-  const navigation = useNavigation();
-
-  const HandleGoBack = () => {
-    navigation.goBack();
-  }
 
   return (
     <SafeAreaView className="flex-row justify-between items-center" style={{ paddingTop: currentHeight }}>
@@ -34,6 +31,7 @@ export default function HeaderGroup() {
         title="Criar anúncio"
         className="px-4 py-2 rounded-md w-full"
         icon={<Plus size={20} color="#fff" />}
+        onPress={onPress}
       />
     </SafeAreaView>
   );
