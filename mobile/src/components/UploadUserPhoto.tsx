@@ -1,31 +1,39 @@
 import { User, PencilSimpleLine } from "phosphor-react-native";
-import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from "react-native";
 
-export default function UploadUserPhoto() {
-  const [image, setImage] = useState<string | null>(null);
+type UploadUserPhotoProps = {
+  onChange: (uri: string) => void;
+  value?: string | null;
+}
+
+export default function UploadUserPhoto({ onChange, value }: UploadUserPhotoProps) {
   async function handleUpload() {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images', 'videos'],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+      aspect: [4, 4],
+      quality: 0.8,
     });
 
-    console.log(result);
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+    if (!result.canceled && result.assets[0].uri) {
+      onChange(result.assets[0].uri);
     }
   }
 
   return (
-    <View className='border-2 rounded-full  bg-base-gray-5 border-product-blue-light mt-5'>
-      {image ? <Image className="rounded-full p-12" source={{ uri: image }} width={50} height={50} /> : <View className="p-4"><User size={50} /></View>}
-      <TouchableOpacity className='absolute top-14 left-12 bg-product-blue-light rounded-full p-3' onPress={handleUpload}>
-        <PencilSimpleLine color='#fff' size={18} />
+    <View className='border-2 rounded-full bg-base-gray-5 border-product-blue-light mt-5 w-24 h-24 items-center justify-center'>
+      {value ? (
+        <Image className="rounded-full w-full h-full" source={{ uri: value }} />
+      ) : (
+        <User size={40} color="#5F5B62" />
+      )}
+      <TouchableOpacity
+        className='absolute -bottom-1 -right-1 bg-product-blue-light rounded-full p-2'
+        onPress={handleUpload}
+      >
+        <PencilSimpleLine color='#fff' size={16} />
       </TouchableOpacity>
     </View>
   )
