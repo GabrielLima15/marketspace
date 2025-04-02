@@ -1,5 +1,3 @@
-// auth.routes.tsx
-
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { House, Tag } from "phosphor-react-native";
@@ -10,6 +8,7 @@ import AdDetails from "@screens/Auth/AdDetails";
 import MyAds from "@screens/Auth/MyAds";
 import MyAdsDetails from "@screens/Auth/MyAdsDetails";
 import AddAds from "@screens/Auth/AddAds";
+import PreviewAds from "@screens/Auth/PreviewAds";
 
 // Tabs
 export type AppAuthBottomTabRoutes = {
@@ -50,6 +49,21 @@ export type AppAuthStackRoutes = {
     }
   };
   addads: undefined;
+  previewads: {
+    data: {
+      title: string;
+      description: string;
+      price: string;
+      images: string[];
+      condition: "novo" | "usado";
+      acceptTrade: boolean;
+      paymentMethods: string[];
+      user: {
+        name: string;
+        avatar?: string | null;
+      };
+    }
+  };
 };
 
 const Tab = createBottomTabNavigator<AppAuthBottomTabRoutes>();
@@ -89,6 +103,7 @@ export function AuthRoutes() {
         <Stack.Screen name="adetails" component={AdDetails} />
         <Stack.Screen name="myadsdetails" component={MyAdsDetails} />
         <Stack.Screen name="addads" component={AddAds} />
+        <Stack.Screen name="previewads" component={PreviewAds} />
       </Stack.Navigator>
     </Host>
   );
