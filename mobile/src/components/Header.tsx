@@ -38,7 +38,7 @@ export default function Header({ back, routeTitle, title, addAds, editAds, onPre
           <Plus size={24} color="black" />
         </TouchableOpacity>
       ) : editAds ? (
-        <TouchableOpacity onPress={handleGoBack}>
+        <TouchableOpacity onPress={onPress}>
           <PencilLine size={24} color="black" />
         </TouchableOpacity>
       ) : (
