@@ -9,9 +9,10 @@ type Props = {
   title?: string
   addAds?: boolean
   editAds?: boolean
+  onPress?: () => void
 }
 
-export default function Header({ back, routeTitle, title, addAds, editAds }: Props) {
+export default function Header({ back, routeTitle, title, addAds, editAds, onPress }: Props) {
 
   const navigation = useNavigation();
 
@@ -33,7 +34,7 @@ export default function Header({ back, routeTitle, title, addAds, editAds }: Pro
       ) : <View />}
 
       {addAds ? (
-        <TouchableOpacity onPress={handleGoBack}>
+        <TouchableOpacity onPress={onPress}>
           <Plus size={24} color="black" />
         </TouchableOpacity>
       ) : editAds ? (
