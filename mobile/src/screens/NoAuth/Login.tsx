@@ -9,6 +9,7 @@ import { ScrollView, Text, View } from "react-native";
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { NoAuthNavigatorRoutesProps } from '@routes/app.no.auth.routes';
+import { useAuth } from '@hooks/useAuth';
 
 const loginSchema = z.object({
   email: z.string().min(5, { message: "Must be 5 or more characters long" }),
@@ -21,6 +22,8 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<NoAuthNavigatorRoutesProps>();
 
+  const { signIn } = useAuth()
+
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
     resolver: zodResolver(loginSchema)
   });
@@ -28,7 +31,8 @@ export default function Login() {
   async function handleLogin(data: FormDataProps) {
     try {
       setIsLoading(true);
-      console.log("Dados do Formulário:", data);
+      const response = await signIn(data.email, data.password)
+      console.log("🚀 ~ handleLogin ~ response:", response)
     } catch (error) {
       console.error(error);
     } finally {

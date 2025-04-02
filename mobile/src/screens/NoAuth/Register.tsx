@@ -8,9 +8,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Input from '@components/Input';
 import Button from '@components/Button';
 import UploadUserPhoto from '@components/UploadUserPhoto';
-import { DoRegister } from '@services/auth';
+import * as FileSystem from 'expo-file-system';
+import { api } from '@services/api';
+import axios from 'axios';
 
-const loginSchema = z.object({
+const registerSchema = z.object({
+  avatar: z.any().optional(),
   name: z.string().nonempty("Informe o nome").min(3, "O nome precisa ter pelo menos 3 caracteres"),
   email: z.string().nonempty("Informe o email").email("Email inválido"),
   tel: z.string().nonempty("Informe o telefone"),
@@ -28,29 +31,80 @@ const loginSchema = z.object({
 
 
 
-type FormDataProps = z.infer<typeof loginSchema>;
+type FormDataProps = z.infer<typeof registerSchema>;
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
-    resolver: zodResolver(loginSchema)
+    resolver: zodResolver(registerSchema)
   })
 
   async function handleRegister(data: FormDataProps) {
+    console.log("🚀 ~ handleRegister ~ data:", data)
     try {
       setIsLoading(true);
 
-      await DoRegister({
+      const formData = new FormData();
+
+      if (data.avatar) {
+        const fileInfo = await FileSystem.getInfoAsync(data.avatar);
+        if (fileInfo.exists) {
+          const fileType = fileInfo.uri.split('.').pop();
+          formData.append('avatar', {
+            uri: data.avatar,
+            name: `avatar.${fileType}`,
+            type: `image/${fileType}`,
+          } as any);
+        }
+      }
+
+      formData.append('name', data.name);
+      formData.append('email', data.email);
+      formData.append('tel', data.tel);
+      formData.append('password', data.password);
+
+      console.log("Enviando requisição para:", api.defaults.baseURL + '/users/');
+      console.log("Dados do formulário:", {
         name: data.name,
         email: data.email,
         tel: data.tel,
-        password: data.password
+        hasAvatar: !!data.avatar
       });
 
+      const response = await api.post('/users/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        transformRequest: (data) => data, // Isso pode ajudar com alguns problemas de FormData
+      });
+
+      console.log('Resposta do servidor:', response.data);
+      // navigation.navigate('');
+
     } catch (error) {
-      console.error(error);
+      console.error('Erro ao cadastrar:', error);
+
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          // O servidor respondeu com um status fora do range 2xx
+          console.error('Erro na resposta:', {
+            status: error.response.status,
+            data: error.response.data,
+            headers: error.response.headers,
+          });
+        } else if (error.request) {
+          // A requisição foi feita mas nenhuma resposta foi recebida
+          console.error('Erro na requisição:', error.request);
+        } else {
+          // Algum erro ocorreu ao configurar a requisição
+          console.error('Erro de configuração:', error.message);
+        }
+      } else {
+        // Erro não relacionado ao Axios
+        console.error('Erro inesperado:', error);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +123,13 @@ export default function Register() {
         <Text className='text-base-gray-2 mt-5 text-center font-normal leading-base text-sm'>{`Crie sua conta e use o espaço para comprar \n itens variados e vender seus produtos`}</Text>
       </View>
 
-      <UploadUserPhoto />
+      <Controller
+        control={control}
+        name="avatar"
+        render={({ field: { onChange, value } }) => (
+          <UploadUserPhoto onChange={onChange} value={value} />
+        )}
+      />
 
       <View className="pt-8 pb-16 w-80">
 
