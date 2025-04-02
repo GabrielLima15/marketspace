@@ -2,18 +2,19 @@ import { useAuth } from '@hooks/useAuth'
 import { NavigationContainer } from '@react-navigation/native'
 import { NoAuthRoutes } from './app.no.auth.routes'
 import { AuthRoutes } from './app.auth.routes'
+import Loading from '@components/Loading'
 
 export default function AppRoutes() {
 
-  const { user } = useAuth()
+  const { user, isLoadingUserStorageData } = useAuth()
 
-  // if (isLoadingUserStorageData) {
-  //   return <Loading />
-  // }
+  if (isLoadingUserStorageData) {
+    return <Loading size="large" />
+  }
 
   return (
     <NavigationContainer>
-      {!user.id ? <AuthRoutes /> : <NoAuthRoutes />}
+      {user.id ? <AuthRoutes /> : <NoAuthRoutes />}
     </NavigationContainer>
   )
 }
