@@ -10,6 +10,9 @@ import { Controller, useForm } from "react-hook-form";
 import { ScrollView, Text, View } from "react-native";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigation } from "@react-navigation/native";
+import { AppAuthStackRoutes } from "@routes/app.auth.routes";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 
 
@@ -33,6 +36,8 @@ export default function AddAds() {
   const [selected, setSelected] = useState("");
   const [acceptTrade, setAcceptTrade] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+
+  const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
 
   const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(adSchema),
@@ -63,28 +68,12 @@ export default function AddAds() {
   const paymentMethods = ["Boleto", "Pix", "Dinheiro", "Cartão de Crédito", "Depósito Bancário"];
 
   async function handleCreateAd(data: any) {
-    try {
-      setIsLoading(true);
-      console.log("Imagens:", data.images);
-      console.log("Dados completos:", data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+    navigation.navigate("previewads", { data });
   }
 
   return (
     <View className="flex-1 bg-base-gray-6">
       <Header back routeTitle title="Criar anúncio" />
-
-      {/* <Controller
-        control={control}
-        name="email"
-        render={({ field: { onChange, value } }) => (
-          <Input keyboardType='email-address' value={value} onChangeText={onChange} placeholder="E-mail" />
-        )}
-      /> */}
 
       <ScrollView className="mx-5 mt-5 mb-24">
         <Text className="text-base-gray-2 text-base font-bold leading-base">Imagens</Text>
@@ -202,8 +191,9 @@ export default function AddAds() {
         <View className="flex-row justify-center w-full gap-4">
           <View className="w-[13rem]">
             <Button
-              title="Criar anúncio"
+              title="Cancelar"
               color="gray"
+              onPress={navigation.goBack}
             />
           </View>
 
