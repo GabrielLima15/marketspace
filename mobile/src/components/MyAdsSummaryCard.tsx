@@ -1,3 +1,6 @@
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AppAuthBottomTabRoutes } from "@routes/app.auth.routes";
 import { ArrowRight, Tag } from "phosphor-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -6,6 +9,11 @@ type Props = {
 }
 
 export default function MyAdsSummaryCard({ numberOfAds }: Props) {
+
+  const navigation = useNavigation<NativeStackNavigationProp<AppAuthBottomTabRoutes>>();
+
+  const handleNavigateToMyAds = () => navigation.navigate("myads");
+
   return (
     numberOfAds ? (
       <View className="w-full flex-row items-center justify-between h-20 px-4 mt-4 bg-[rgba(100,121,199,0.3)] rounded-md">
@@ -17,7 +25,7 @@ export default function MyAdsSummaryCard({ numberOfAds }: Props) {
           </View>
         </View>
 
-        <TouchableOpacity className="flex-row items-center gap-2">
+        <TouchableOpacity onPress={handleNavigateToMyAds} className="flex-row items-center gap-2">
           <Text className="text-sm text-product-blue-light font-bold">
             Meus anúncios
           </Text>
