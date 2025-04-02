@@ -115,7 +115,9 @@ export default function MyAds() {
 
   return (
     <View className="">
-      <Header addAds title="Meus anúncios" routeTitle />
+      <Header onPress={
+        () => navigation.navigate("addads")
+      } addAds title="Meus anúncios" routeTitle />
 
       <View className="mx-8">
 
