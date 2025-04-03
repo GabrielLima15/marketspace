@@ -1,10 +1,11 @@
-import Header from "@components/Header";
 import ImageCarousel from "@components/Carrousel";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { AppAuthStackRoutes } from "@routes/app.auth.routes";
 import { Image, ScrollView, Text, View } from "react-native";
 import { Bank, Barcode, CreditCard, Money, Power, QrCode, Trash, User } from "phosphor-react-native";
 import Button from "@components/Button";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import Header from "@components/Header";
 
 export default function MyAdsDetails() {
   const route = useRoute<RouteProp<AppAuthStackRoutes, "myadsdetails">>();
@@ -14,9 +15,15 @@ export default function MyAdsDetails() {
 
   const avatar = user?.avatar
 
+  const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
+
+  const handleEditAd = () => {
+    navigation.navigate("editadsdetails", { ...data });
+  }
+
   return (
     <ScrollView className="flex-1 bg-base-gray-7">
-      <Header back editAds />
+      <Header back editAds onPress={handleEditAd} />
 
       <View className="relative">
         <ImageCarousel
