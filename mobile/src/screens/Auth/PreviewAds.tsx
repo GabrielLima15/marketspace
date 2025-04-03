@@ -6,6 +6,9 @@ import { ArrowLeft, Bank, Barcode, CreditCard, Money, QrCode, Tag, User } from "
 import Button from "@components/Button";
 import { useAuth } from "@hooks/useAuth";
 import { useState } from "react";
+import { api } from "@services/api";
+import { getUserAvatarUrl } from "@utils/GetUserAvatar";
+import { uploadImages } from "@utils/UploadImages";
 
 const paymentIcons: any = {
   "Boleto": <Barcode />,
@@ -33,9 +36,11 @@ export default function PreviewAds() {
   const route = useRoute<RouteProp<AppAuthStackRoutes, "previewads">>();
   const { data } = route.params;
 
-  const { user } = useAuth();
+  const { user } = useAuth()
+  console.log("🚀 ~ PreviewAds ~ user:", user)
 
-  const avatar = user?.avatar;
+  const avatarUrl = getUserAvatarUrl(user?.avatar);
+
 
   const productImages = data.images || [];
   const [isLoading, setIsLoading] = useState(false);
@@ -43,15 +48,39 @@ export default function PreviewAds() {
   const navigate = useNavigation();
 
   const handleCreateAd = async (data: PropsData) => {
+    console.log("🚀 ~ handleCreateAd ~ data:", data);
+
+    const paymentMethodMap: any = {
+      "Boleto": "boleto",
+      "Pix": "pix",
+      "Dinheiro": "cash",
+      "Cartão de Crédito": "card",
+      "Depósito Bancário": "deposit"
+    };
+
     try {
       setIsLoading(true);
-      const response = await ('');
+
+      const response = await api.post('products', {
+        name: data.title,
+        description: data.description,
+        is_new: data.condition === "novo",
+        price: Number(data.price),
+        accept_trade: data.acceptTrade,
+        payment_methods: data.paymentMethods.map(method => paymentMethodMap[method])
+      });
+
+      const productId = response.data.id;
+      await uploadImages({ images: data.images, productId });
+
+      console.log("✅ Imagens enviadas com sucesso!");
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+
 
   return (
     <View className="flex-1 bg-base-gray-7">
@@ -71,9 +100,9 @@ export default function PreviewAds() {
 
       <ScrollView className="mx-4 mt-4">
         <View className="flex-row items-center gap-2">
-          {avatar ? (
+          {avatarUrl ? (
             <View className="border-[2px] border-product-blue-light rounded-full">
-              <Image source={{ uri: avatar }} className="w-8 h-8 rounded-full" />
+              <Image source={{ uri: avatarUrl }} className="w-8 h-8 rounded-full" />
             </View>
           ) : (
             <View className="border-[2px] border-product-blue-light rounded-full p-1">
