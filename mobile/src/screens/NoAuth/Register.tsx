@@ -10,7 +10,8 @@ import Button from '@components/Button';
 import UploadUserPhoto from '@components/UploadUserPhoto';
 import * as FileSystem from 'expo-file-system';
 import { api } from '@services/api';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { NoAuthNavigatorRoutesProps } from '@routes/app.no.auth.routes';
 
 const registerSchema = z.object({
   avatar: z.any().optional(),
@@ -35,11 +36,12 @@ type FormDataProps = z.infer<typeof registerSchema>;
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
-  const navigation = useNavigation();
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
     resolver: zodResolver(registerSchema)
   })
+
+  const navigation = useNavigation<NoAuthNavigatorRoutesProps>();
 
   async function handleRegister(data: FormDataProps) {
     console.log("🚀 ~ handleRegister ~ data:", data)
@@ -65,14 +67,6 @@ export default function Register() {
       formData.append('tel', data.tel);
       formData.append('password', data.password);
 
-      console.log("Enviando requisição para:", api.defaults.baseURL + '/users/');
-      console.log("Dados do formulário:", {
-        name: data.name,
-        email: data.email,
-        tel: data.tel,
-        hasAvatar: !!data.avatar
-      });
-
       const response = await api.post('/users/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -80,30 +74,28 @@ export default function Register() {
         transformRequest: (data) => data, // Isso pode ajudar com alguns problemas de FormData
       });
 
-      console.log('Resposta do servidor:', response.data);
-      // navigation.navigate('');
+      console.log('Resposta do servidor:', JSON.stringify(response));
+      navigation.navigate('login');
 
     } catch (error) {
       console.error('Erro ao cadastrar:', error);
 
       if (axios.isAxiosError(error)) {
-        if (error.response) {
-          // O servidor respondeu com um status fora do range 2xx
-          console.error('Erro na resposta:', {
-            status: error.response.status,
-            data: error.response.data,
-            headers: error.response.headers,
-          });
-        } else if (error.request) {
-          // A requisição foi feita mas nenhuma resposta foi recebida
-          console.error('Erro na requisição:', error.request);
+        const axiosError = error as AxiosError;
+
+        if (axiosError.response) {
+          // ✅ A API respondeu, mas com status de erro (ex: 400, 404, 500)
+          console.log('Erro da API:', axiosError.response.data);
+        } else if (axiosError.request) {
+          // ❌ A requisição foi feita mas não houve resposta
+          console.log('Erro de rede ou servidor fora do ar:', axiosError.message);
         } else {
-          // Algum erro ocorreu ao configurar a requisição
-          console.error('Erro de configuração:', error.message);
+          // ⚙️ Erro ao configurar a requisição
+          console.log('Erro de configuração do Axios:', axiosError.message);
         }
       } else {
-        // Erro não relacionado ao Axios
-        console.error('Erro inesperado:', error);
+        // 🚫 Erro que não veio do Axios (ex: erro de código JS)
+        console.error('Erro desconhecido:', error);
       }
     } finally {
       setIsLoading(false);
