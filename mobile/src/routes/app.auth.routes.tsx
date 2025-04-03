@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { House, Tag } from "phosphor-react-native";
+import { House, SignOut, Tag } from "phosphor-react-native";
 import { Host } from "react-native-portalize";
 
 import Home from "@screens/Auth/Home";
@@ -9,11 +9,16 @@ import MyAds from "@screens/Auth/MyAds";
 import MyAdsDetails from "@screens/Auth/MyAdsDetails";
 import AddAds from "@screens/Auth/AddAds";
 import PreviewAds from "@screens/Auth/PreviewAds";
+import EditAdsDetails from "@screens/Auth/EditAdsDetails";
+import { TouchableOpacity } from "react-native";
+import { AuthContext } from "@contexts/AuthContext";
+import { useContext } from "react";
 
 // Tabs
 export type AppAuthBottomTabRoutes = {
   home: undefined;
   myads: undefined;
+  logout: undefined
 };
 
 // Stack
@@ -64,12 +69,24 @@ export type AppAuthStackRoutes = {
       };
     }
   };
+  editadsdetails: {
+    id: string
+    title: string
+    isUsed: boolean
+    price: string
+    image: string
+    isDisabled: boolean
+  },
 };
 
 const Tab = createBottomTabNavigator<AppAuthBottomTabRoutes>();
 const Stack = createNativeStackNavigator<AppAuthStackRoutes>();
 
 function BottomTabs() {
+
+  const { signOut } = useContext(AuthContext);
+
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -91,6 +108,20 @@ function BottomTabs() {
           tabBarIcon: ({ color, size }) => <Tag size={size} color={color} />,
         }}
       />
+      <Tab.Screen
+        name="logout"
+        component={() => null}
+        options={{
+          tabBarButton: () => (
+            <TouchableOpacity
+              onPress={async () => await signOut()}
+              style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            >
+              <SignOut size={24} color="red" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }
@@ -104,6 +135,7 @@ export function AuthRoutes() {
         <Stack.Screen name="myadsdetails" component={MyAdsDetails} />
         <Stack.Screen name="addads" component={AddAds} />
         <Stack.Screen name="previewads" component={PreviewAds} />
+        <Stack.Screen name="editadsdetails" component={EditAdsDetails} />
       </Stack.Navigator>
     </Host>
   );
