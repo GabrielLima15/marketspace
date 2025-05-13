@@ -68,7 +68,7 @@ export default function PreviewAds() {
         price: Number(data.price),
         accept_trade: data.acceptTrade,
         payment_methods: data.paymentMethods.map(method => paymentMethodMap[method])
-      });
+      });    
 
       const productId = response.data.id;
       await uploadImages({ images: data.images, productId });
@@ -98,7 +98,7 @@ export default function PreviewAds() {
         indicatorHeight={3}
       />
 
-      <ScrollView className="mx-4 mt-4">
+      <ScrollView showsVerticalScrollIndicator={false} className="mx-4 mt-4">
         <View className="flex-row items-center gap-2">
           {avatarUrl ? (
             <View className="border-[2px] border-product-blue-light rounded-full">
@@ -141,7 +141,7 @@ export default function PreviewAds() {
           </Text>
         </View>
 
-        <View className="flex-col mt-2 gap-2">
+        <View className="flex-col mt-2 gap-2 mb-8">
           <Text className="mt-5 text-base-gray-2 text-sm font-bold leading-base">
             Meios de pagamento:
           </Text>
@@ -155,7 +155,7 @@ export default function PreviewAds() {
         </View>
       </ScrollView>
 
-      <View className="w-full h-20 bg-white absolute bottom-0 justify-center">
+      <View className="w-full h-20 bg-white justify-center">
         <View className="flex-row justify-center w-full gap-4">
           <View className="w-[45%]">
             <Button
