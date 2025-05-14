@@ -13,6 +13,7 @@ import { api } from '@services/api';
 import axios, { AxiosError } from 'axios';
 import { NoAuthNavigatorRoutesProps } from '@routes/app.no.auth.routes';
 import { useAuth } from '@hooks/useAuth';
+import Toast from 'react-native-toast-message';
 
 const registerSchema = z.object({
   avatar: z.any().optional(),
@@ -47,7 +48,6 @@ export default function Register() {
   const navigation = useNavigation<NoAuthNavigatorRoutesProps>();
 
   async function handleRegister(data: FormDataProps) {
-    console.log("🚀 ~ handleRegister ~ data:", data)
     try {
       setIsLoading(true);
 
@@ -79,7 +79,11 @@ export default function Register() {
 
       await signIn(data.email, data.password);
 
-      console.log("✅ Registro e login automático concluídos:", response.data)
+      Toast.show({
+        type: 'success',
+        text1: 'Cadastro realizado com sucesso!',
+      });
+
     } catch (error) {
       console.error("❌ Erro ao registrar ou autenticar:", error)
     } finally {
