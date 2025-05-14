@@ -12,6 +12,7 @@ import * as FileSystem from 'expo-file-system';
 import { api } from '@services/api';
 import axios, { AxiosError } from 'axios';
 import { NoAuthNavigatorRoutesProps } from '@routes/app.no.auth.routes';
+import { useAuth } from '@hooks/useAuth';
 
 const registerSchema = z.object({
   avatar: z.any().optional(),
@@ -40,6 +41,8 @@ export default function Register() {
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
     resolver: zodResolver(registerSchema)
   })
+
+  const { signIn } = useAuth()
 
   const navigation = useNavigation<NoAuthNavigatorRoutesProps>();
 
@@ -71,32 +74,14 @@ export default function Register() {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        transformRequest: (data) => data, // Isso pode ajudar com alguns problemas de FormData
+        transformRequest: (data) => data,
       });
 
-      console.log('Resposta do servidor:', JSON.stringify(response));
-      navigation.navigate('login');
+      await signIn(data.email, data.password);
 
+      console.log("✅ Registro e login automático concluídos:", response.data)
     } catch (error) {
-      console.error('Erro ao cadastrar:', error);
-
-      if (axios.isAxiosError(error)) {
-        const axiosError = error as AxiosError;
-
-        if (axiosError.response) {
-          // ✅ A API respondeu, mas com status de erro (ex: 400, 404, 500)
-          console.log('Erro da API:', axiosError.response.data);
-        } else if (axiosError.request) {
-          // ❌ A requisição foi feita mas não houve resposta
-          console.log('Erro de rede ou servidor fora do ar:', axiosError.message);
-        } else {
-          // ⚙️ Erro ao configurar a requisição
-          console.log('Erro de configuração do Axios:', axiosError.message);
-        }
-      } else {
-        // 🚫 Erro que não veio do Axios (ex: erro de código JS)
-        console.error('Erro desconhecido:', error);
-      }
+      console.error("❌ Erro ao registrar ou autenticar:", error)
     } finally {
       setIsLoading(false);
     }
