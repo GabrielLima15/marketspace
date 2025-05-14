@@ -23,7 +23,7 @@ export type AppAuthBottomTabRoutes = {
 
 // Stack
 export type AppAuthStackRoutes = {
-  tabs: undefined;
+  tabs: { screen: keyof AppAuthBottomTabRoutes };
   adetails: {
     data: {
       id: string;
