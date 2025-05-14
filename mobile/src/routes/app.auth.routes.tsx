@@ -13,6 +13,7 @@ import EditAdsDetails from "@screens/Auth/EditAdsDetails";
 import { TouchableOpacity } from "react-native";
 import { AuthContext } from "@contexts/AuthContext";
 import { useContext } from "react";
+import { ProductDTO } from "@dtos/ProductDTO";
 
 // Tabs
 export type AppAuthBottomTabRoutes = {
@@ -39,19 +40,7 @@ export type AppAuthStackRoutes = {
     };
   };
   myadsdetails: {
-    product: {
-      id: string
-      title: string
-      isUsed: boolean
-      price: string
-      image: string
-      isDisabled: boolean
-    },
-    user: {
-      id: string
-      avatar: string
-      name: string
-    }
+    product: ProductDTO;
   };
   addads: undefined;
   previewads: {
