@@ -19,6 +19,8 @@ type ProductContextDataProps = {
   updateProduct: (data: any, productId: string) => Promise<void>;
   fetchUserProducts: () => Promise<void>;
   deleteProduct: (productId: string) => Promise<void>;
+  toggleProductActiveStatus: (productId: string, isActive: boolean) => Promise<void>;
+  deleteProductImages: (imageIds: string[]) => Promise<void>;
 }
 
 type ProductContextProviderProps = {
@@ -93,6 +95,32 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
     }
   }
 
+  async function toggleProductActiveStatus(productId: string, isActive: boolean) {
+    try {
+      await api.patch(`/products/${productId}`, {
+        is_active: isActive
+      });
+
+      await fetchUserProducts();
+    } catch (error) {
+      console.error("Erro ao alterar status do produto:", error);
+      throw error;
+    }
+  }
+
+  async function deleteProductImages(imageIds: string[]) {
+    try {
+      await api.delete('/products/images/', {
+        data: {
+          images: imageIds
+        }
+      });
+    } catch (error) {
+      console.error("Erro ao excluir imagens do produto:", error);
+      throw error;
+    }
+  }
+
   async function loadStoredProducts() {
     try {
       const stored = await storageProductsGet();
@@ -118,7 +146,9 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
       createProduct,
       updateProduct,
       fetchUserProducts,
-      deleteProduct
+      deleteProduct,
+      toggleProductActiveStatus,
+      deleteProductImages
     }}>
       {children}
     </ProductContext.Provider>
