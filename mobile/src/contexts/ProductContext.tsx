@@ -14,6 +14,7 @@ const paymentMethodMap: Record<string, string> = {
 };
 
 type ProductContextDataProps = {
+  userProducts: ProductDTO[];
   products: ProductDTO[];
   createProduct: (data: any) => Promise<void>;
   updateProduct: (data: any, productId: string) => Promise<void>;
@@ -30,6 +31,7 @@ type ProductContextProviderProps = {
 export const ProductContext = createContext<ProductContextDataProps>({} as ProductContextDataProps);
 
 export function ProductContextProvider({ children }: ProductContextProviderProps) {
+  const [userProducts, setUserProducts] = useState<ProductDTO[]>([]);
   const [products, setProducts] = useState<ProductDTO[]>([]);
   const { user } = useAuth();
 
@@ -38,8 +40,18 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
   async function fetchUserProducts() {
     try {
       const response = await api.get('/users/products');
-      setProducts(response.data);
+      setUserProducts(response.data);
       await storageProductsSave(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+    }
+  }
+
+  async function fetchProducts() {
+    try {
+      const response = await api.get('/products');
+      console.log("🚀 ~ fetchProducts ~ response:", response)
+      setProducts(response.data);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
     }
@@ -121,27 +133,29 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
     }
   }
 
-  async function loadStoredProducts() {
+  async function loadStoredUserProducts() {
     try {
       const stored = await storageProductsGet();
-      setProducts(stored);
+      setUserProducts(stored);
     } catch (error) {
       console.error("Erro ao carregar produtos do storage:", error);
     }
   }
 
   useEffect(() => {
-    loadStoredProducts();
+    loadStoredUserProducts();
   }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchUserProducts();
+      fetchProducts();
     }
   }, [isAuthenticated]);
 
   return (
     <ProductContext.Provider value={{
+      userProducts,
       products,
       createProduct,
       updateProduct,
