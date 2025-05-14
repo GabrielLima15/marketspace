@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppAuthBottomTabRoutes } from "@routes/app.auth.routes";
 import { ArrowRight, Tag } from "phosphor-react-native";
+import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 export default function MyAdsSummaryCard() {
