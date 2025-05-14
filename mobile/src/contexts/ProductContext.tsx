@@ -3,6 +3,7 @@ import { ProductDTO } from "@dtos/ProductDTO";
 import { api } from "@services/api";
 import { storageProductsGet, storageProductsSave } from "@storage/storageProducts";
 import { uploadImages } from "@utils/UploadImages";
+import { useAuth } from "@hooks/useAuth";
 
 const paymentMethodMap: Record<string, string> = {
   "boleto": "boleto",
@@ -14,7 +15,6 @@ const paymentMethodMap: Record<string, string> = {
 
 type ProductContextDataProps = {
   products: ProductDTO[];
-  fetchProducts: () => Promise<void>;
   createProduct: (data: any) => Promise<void>;
 }
 
@@ -26,6 +26,9 @@ export const ProductContext = createContext<ProductContextDataProps>({} as Produ
 
 export function ProductContextProvider({ children }: ProductContextProviderProps) {
   const [products, setProducts] = useState<ProductDTO[]>([]);
+  const { user } = useAuth();
+
+  const isAuthenticated = !!user.id;
 
   async function fetchProducts() {
     try {
@@ -69,13 +72,17 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
 
   useEffect(() => {
     loadStoredProducts();
-    fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchProducts();
+    }
+  }, [isAuthenticated]);
 
   return (
     <ProductContext.Provider value={{
       products,
-      fetchProducts,
       createProduct
     }}>
       {children}
