@@ -1,13 +1,22 @@
 import { Plus, X } from "phosphor-react-native";
 import { TouchableOpacity, View, Image } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
+import { useProduct } from "@hooks/useProduct";
+
+type ImageItem = {
+  uri: string;
+  id?: string;
+};
 
 type Props = {
-  images: string[];
-  setImages: (imgs: string[]) => void;
+  images: ImageItem[];
+  setImages: (imgs: ImageItem[]) => void;
 };
 
 export default function UploadAdPhoto({ images, setImages }: Props) {
+
+  const { deleteProductImages } = useProduct();
+
   async function handleUpload() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -18,23 +27,33 @@ export default function UploadAdPhoto({ images, setImages }: Props) {
 
     if (!result.canceled) {
       if (images.length < 3) {
-        setImages([...images, result.assets[0].uri]);
+        setImages([...images, { uri: result.assets[0].uri }]);
       }
     }
   }
 
-  function handleRemoveImage(uri: string) {
-    setImages(images.filter((img) => img !== uri));
+  async function handleRemoveImage(image: ImageItem) {
+    // Se tiver `id`, chama delete na API
+    if (image.id) {
+      try {
+        await deleteProductImages([image.id]);
+      } catch (error) {
+        console.error("Erro ao excluir imagem do servidor:", error);
+      }
+    }
+
+    // Remove da lista local (sempre)
+    setImages(images.filter((img) => img.uri !== image.uri));
   }
 
   return (
     <View className="flex-row gap-3">
-      {images.map((uri, index) => (
+      {images.map((image, index) => (
         <View key={index} className="relative rounded-md overflow-hidden">
-          <Image source={{ uri }} className="w-24 h-24 rounded-md" />
+          <Image source={{ uri: image.uri }} className="w-24 h-24 rounded-md" />
           <TouchableOpacity
             className="absolute top-1 right-1 bg-black/60 rounded-full p-1"
-            onPress={() => handleRemoveImage(uri)}
+            onPress={() => handleRemoveImage(image)}
           >
             <X color="#fff" size={16} />
           </TouchableOpacity>
