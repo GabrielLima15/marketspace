@@ -27,12 +27,7 @@ export default function MyAdsDetails() {
 
   const handleEditAd = () => {
     navigation.navigate("editadsdetails", {
-      id: product.id,
-      title: product.name,
-      isUsed: !product.is_new,
-      price: (product.price / 100).toFixed(2),
-      image: `${api.defaults.baseURL}/images/${product.product_images[0]?.path}`,
-      isDisabled: !product.is_active
+      product
     });
   };
 
