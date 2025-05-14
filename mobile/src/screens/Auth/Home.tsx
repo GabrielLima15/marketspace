@@ -2,6 +2,7 @@ import CardsAds from "@components/CardsAds";
 import HeaderGroup from "@components/HeaderGroup";
 import MyAdsSummaryCard from "@components/MyAdsSummaryCard";
 import SearchFilter from "@components/SearchFilter";
+import { useProduct } from "@hooks/useProduct";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppAuthStackRoutes } from "@routes/app.auth.routes";
@@ -104,10 +105,6 @@ export default function Home() {
       className="flex-1 mx-8"
     >
       <HeaderGroup onPress={handleNavigateToAddAds} />
-
-      <Text className="pt-8 text-base text-base-gray-3 font-karla font-normal leading-base">
-        Seus produtos anunciados para venda
-      </Text>
 
       <MyAdsSummaryCard />
 
