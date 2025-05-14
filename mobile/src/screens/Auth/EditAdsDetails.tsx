@@ -5,7 +5,7 @@ import Input from "@components/Input";
 import Radio from "@components/Radio";
 import Switch from "@components/Switch";
 import UploadAdPhoto from "@components/UploadAdPhoto";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ScrollView, Text, View } from "react-native";
 import { z } from "zod";
@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { AppAuthStackRoutes } from "@routes/app.auth.routes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { getImages } from "@utils/GetImages";
 
 
 
@@ -40,8 +41,8 @@ export default function EditAdsDetails() {
   const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
 
   const route = useRoute<RouteProp<AppAuthStackRoutes, "editadsdetails">>();
-  const { id, image, isDisabled, isUsed, price, title } = route.params;
-  console.log("🚀 ~ EditAdsDetails ~ route:", route)
+  const { product } = route.params;
+  console.log("🚀 ~ EditAdsDetails ~ product:", product)
 
   const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(adSchema),
@@ -51,6 +52,23 @@ export default function EditAdsDetails() {
       paymentMethods: [],
     },
   });
+
+  useEffect(() => {
+    if (product) {
+      setValue("title", product.name);
+      setValue("description", product.description);
+      setValue("price", (product.price / 100).toFixed(2));
+      setValue("condition", product.is_new ? "novo" : "usado");
+      setValue("acceptTrade", product.accept_trade);
+      setValue("paymentMethods", product.payment_methods.map(m => m.name));
+      setSelected(product.is_new ? "novo" : "usado");
+      setSelectedOptions(product.payment_methods.map(m => m.name));
+      setValue(
+        "images",
+        product.product_images.map(img => getImages(img.path) || '')
+      );
+    }
+  }, [product, setValue]);
 
   const images = watch("images") || [];
 
@@ -71,13 +89,13 @@ export default function EditAdsDetails() {
 
   const paymentMethods = ["Boleto", "Pix", "Dinheiro", "Cartão de Crédito", "Depósito Bancário"];
 
-  async function handleCreateAd(data: any) {
+  async function next(data: any) {
     navigation.navigate("previewads", { data });
   }
 
   return (
     <View className="flex-1 bg-base-gray-6">
-      <Header back routeTitle title="Criar anúncio" />
+      <Header back routeTitle title="Editar anúncio" />
 
       <ScrollView className="mx-5 mt-5 mb-24">
         <Text className="text-base-gray-2 text-base font-bold leading-base">Imagens</Text>
@@ -206,7 +224,7 @@ export default function EditAdsDetails() {
               title="Avançar"
               color="dark"
               isLoading={isLoading}
-              onPress={handleSubmit(handleCreateAd)}
+              onPress={handleSubmit(next)}
             />
           </View>
         </View>
