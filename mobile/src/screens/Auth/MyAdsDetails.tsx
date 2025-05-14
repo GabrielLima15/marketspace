@@ -1,23 +1,25 @@
 import ImageCarousel from "@components/Carrousel";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { AppAuthStackRoutes } from "@routes/app.auth.routes";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Alert, Image, ScrollView, Text, View } from "react-native";
 import { Bank, Barcode, CreditCard, Money, Power, QrCode, Trash, User } from "phosphor-react-native";
 import Button from "@components/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Header from "@components/Header";
 import { api } from "@services/api";
-import { useContext } from "react";
-import { AuthContext } from "@contexts/AuthContext";
 import { getUserAvatarUrl } from "@utils/GetUserAvatar";
 import React from "react";
+import Toast from "react-native-toast-message";
+import { useAuth } from "@hooks/useAuth";
+import { useProduct } from "@hooks/useProduct";
 
 export default function MyAdsDetails() {
   const route = useRoute<RouteProp<AppAuthStackRoutes, "myadsdetails">>();
   const { product } = route.params;
 
   const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
+  const { toggleProductActiveStatus, deleteProduct } = useProduct();
 
   const productImages = product.product_images.map(
     image => `${api.defaults.baseURL}/images/${image.path}`
@@ -31,6 +33,42 @@ export default function MyAdsDetails() {
     });
   };
 
+  async function handleToggleActiveStatus() {
+    try {
+      const newStatus = !product.is_active;
+      await toggleProductActiveStatus(product.id, newStatus);
+
+      Toast.show({
+        type: 'success',
+        text1: `Anúncio ${newStatus ? 'reativado' : 'desativado'} com sucesso!`
+      });
+
+      navigation.navigate("tabs", { screen: "myads" });
+
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: `Erro ao ${product.is_active ? 'desativar' : 'reativar'} anúncio`
+      });
+    }
+  }
+
+  async function handleDelete() {
+    try {
+      await deleteProduct(product.id);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Anúncio excluido com sucesso!'
+      });
+      navigation.navigate("tabs", { screen: "myads" });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao excluir anúncio'
+      });
+    }
+  }
 
   return (
     <ScrollView className="flex-1 bg-base-gray-7">
@@ -131,11 +169,26 @@ export default function MyAdsDetails() {
             icon={<Power size={20} color="#fff" />}
             title={product.is_active ? "Desativar anúncio" : "Reativar anúncio"}
             color={product.is_active ? "dark" : "primary"}
+            submit={handleToggleActiveStatus}
           />
           <Button
             icon={<Trash size={20} color="#5F5B62" />}
             title="Excluir anúncio"
             color="gray"
+            submit={() => {
+              Alert.alert(
+                "Excluir anúncio",
+                "Tem certeza que deseja excluir este anúncio?",
+                [
+                  { text: "Cancelar", style: "cancel" },
+                  {
+                    text: "Excluir",
+                    style: "destructive",
+                    onPress: handleDelete
+                  }
+                ]
+              );
+            }}
           />
         </View>
       </View>
