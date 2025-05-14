@@ -44,7 +44,7 @@ export type AppAuthStackRoutes = {
   };
   addads: undefined;
   previewads: {
-    data: {
+    product: {
       title: string;
       description: string;
       price: string;
@@ -52,11 +52,8 @@ export type AppAuthStackRoutes = {
       condition: "novo" | "usado";
       acceptTrade: boolean;
       paymentMethods: string[];
-      user: {
-        name: string;
-        avatar?: string | null;
-      };
-    }
+    };
+    isEdit?: boolean;
   };
   editadsdetails: {
     product: ProductDTO;
