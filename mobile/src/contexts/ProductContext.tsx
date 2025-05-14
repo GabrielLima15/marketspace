@@ -9,13 +9,16 @@ const paymentMethodMap: Record<string, string> = {
   "boleto": "boleto",
   "pix": "pix",
   "dinheiro": "cash",
-  "cartão de crédito": "credit_card",
+  "cartão de crédito": "card",
   "depósito bancário": "deposit"
 };
 
 type ProductContextDataProps = {
   products: ProductDTO[];
   createProduct: (data: any) => Promise<void>;
+  updateProduct: (data: any, productId: string) => Promise<void>;
+  fetchUserProducts: () => Promise<void>;
+  deleteProduct: (productId: string) => Promise<void>;
 }
 
 type ProductContextProviderProps = {
@@ -30,7 +33,7 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
 
   const isAuthenticated = !!user.id;
 
-  async function fetchProducts() {
+  async function fetchUserProducts() {
     try {
       const response = await api.get('/users/products');
       setProducts(response.data);
@@ -48,15 +51,44 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
         is_new: data.condition === "novo",
         price: Number(data.price),
         accept_trade: data.acceptTrade,
-        payment_methods: data.paymentMethods.map((method: string) => paymentMethodMap[method])
+        payment_methods: data.paymentMethods.map((method: string) => paymentMethodMap[method.toLowerCase()])
       });
 
       const productId = response.data.id;
       await uploadImages({ images: data.images, productId });
 
-      await fetchProducts();
+      await fetchUserProducts();
     } catch (error) {
       console.error("Erro ao criar produto:", error);
+      throw error;
+    }
+  }
+
+  async function updateProduct(data: any, productId: string) {
+    try {
+      await api.put(`/products/${productId}`, {
+        name: data.title,
+        description: data.description,
+        is_new: data.condition === "novo",
+        price: Number(data.price),
+        accept_trade: data.acceptTrade,
+        payment_methods: data.paymentMethods.map((method: string) => paymentMethodMap[method.toLowerCase()])
+      });
+
+      await uploadImages({ images: data.images, productId });
+      await fetchUserProducts();
+    } catch (error) {
+      console.error("Erro ao atualizar produto:", error);
+      throw error;
+    }
+  }
+
+  async function deleteProduct(productId: string) {
+    try {
+      await api.delete(`/products/${productId}`);
+      await fetchUserProducts();
+    } catch (error) {
+      console.error("Erro ao excluir produto:", error);
       throw error;
     }
   }
@@ -76,14 +108,17 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchProducts();
+      fetchUserProducts();
     }
   }, [isAuthenticated]);
 
   return (
     <ProductContext.Provider value={{
       products,
-      createProduct
+      createProduct,
+      updateProduct,
+      fetchUserProducts,
+      deleteProduct
     }}>
       {children}
     </ProductContext.Provider>
