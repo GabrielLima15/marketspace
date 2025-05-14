@@ -14,6 +14,7 @@ import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { AppAuthStackRoutes } from "@routes/app.auth.routes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { getImages } from "@utils/GetImages";
+import { ProductDTO } from "@dtos/ProductDTO";
 
 
 
@@ -42,8 +43,6 @@ export default function EditAdsDetails() {
 
   const route = useRoute<RouteProp<AppAuthStackRoutes, "editadsdetails">>();
   const { product } = route.params;
-  console.log("🚀 ~ EditAdsDetails ~ product:", product)
-
   const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(adSchema),
     defaultValues: {
@@ -89,8 +88,14 @@ export default function EditAdsDetails() {
 
   const paymentMethods = ["Boleto", "Pix", "Dinheiro", "Cartão de Crédito", "Depósito Bancário"];
 
-  async function next(data: any) {
-    navigation.navigate("previewads", { data });
+  async function next(product: any) {
+    navigation.navigate("previewads", {
+      product: {
+        ...product,
+        id: route.params.product.id
+      },
+      isEdit: true
+    });
   }
 
   return (
