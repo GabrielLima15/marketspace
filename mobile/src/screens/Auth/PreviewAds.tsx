@@ -1,17 +1,16 @@
 import ImageCarousel from "@components/Carrousel";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { AppAuthBottomTabRoutes, AppAuthStackRoutes } from "@routes/app.auth.routes";
+import { AppAuthStackRoutes } from "@routes/app.auth.routes";
 import { Image, ScrollView, Text, View } from "react-native";
 import { ArrowLeft, Bank, Barcode, CreditCard, Money, QrCode, Tag, User } from "phosphor-react-native";
 import Button from "@components/Button";
 import { useAuth } from "@hooks/useAuth";
 import { useState } from "react";
 import { getUserAvatarUrl } from "@utils/GetUserAvatar";
-import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { uploadImages } from "@utils/UploadImages";
 import Toast from "react-native-toast-message";
-import { api } from "@services/api";
+import { useProduct } from "@hooks/useProduct";
+import { ProductDTO } from "@dtos/ProductDTO";
 
 const paymentIcons: any = {
   "Boleto": <Barcode />,
@@ -21,7 +20,7 @@ const paymentIcons: any = {
   "Depósito Bancário": <Bank />
 };
 
-type PropsData = {
+type FormDataProps = {
   title: string;
   description: string;
   price: string;
@@ -29,70 +28,51 @@ type PropsData = {
   condition: "novo" | "usado";
   acceptTrade: boolean;
   paymentMethods: string[];
-  user: {
-    name: string;
-    avatar?: string | null;
-  };
+  id?: string;
 };
 
 export default function PreviewAds() {
   const route = useRoute<RouteProp<AppAuthStackRoutes, "previewads">>();
-  const { data } = route.params;
+  const { product, isEdit } = route.params;
 
   const { user } = useAuth()
+  const { createProduct, updateProduct } = useProduct()
 
   const avatarUrl = getUserAvatarUrl(user?.avatar);
 
-
-  const productImages = data.images || [];
   const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
 
-  const handleCreateAd = async (data: PropsData) => {
-
-    const paymentMethodMap: any = {
-      "Boleto": "boleto",
-      "Pix": "pix",
-      "Dinheiro": "cash",
-      "Cartão de Crédito": "card",
-      "Depósito Bancário": "deposit"
-    };
-
+  const publishOrUpdateAd = async (data: FormDataProps) => {
     try {
-      setIsLoading(true);      
+      setIsLoading(true);
 
-      const response = await api.post('products', {
-        name: data.title,
-        description: data.description,
-        is_new: data.condition === "novo",
-        price: Number(data.price),
-        accept_trade: data.acceptTrade,
-        payment_methods: data.paymentMethods.map(method => paymentMethodMap[method])
-      });    
+      if (isEdit && data.id) {
+        await updateProduct(data, data.id);
+        Toast.show({
+          type: 'success',
+          text1: 'Anúncio atualizado com sucesso!',
+        });
+      } else {
+        await createProduct(data);
+        Toast.show({
+          type: 'success',
+          text1: 'Anúncio criado com sucesso!',
+        });
+      }
 
-      const productId = response.data.id;
-      await uploadImages({ images: data.images, productId });
-
-      Toast.show({
-        type: 'success',
-        text1: 'Anúncio criado com sucesso!',
-      });
-
-      navigation.navigate('tabs', {
-        screen: 'myads',
-      });
-
+      navigation.navigate('tabs', { screen: 'myads' });
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: 'Erro ao criar anúncio',
-      })
+        text1: isEdit ? 'Erro ao atualizar anúncio' : 'Erro ao criar anúncio',
+      });
+      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }
   };
-
 
   return (
     <View className="flex-1 bg-base-gray-7">
@@ -105,7 +85,7 @@ export default function PreviewAds() {
       </View>
 
       <ImageCarousel
-        images={productImages}
+        images={product.images}
         height={300}
         indicatorHeight={3}
       />
@@ -126,21 +106,21 @@ export default function PreviewAds() {
 
         <View className="bg-base-gray-5 rounded-full mt-8 w-14 h-w-14 items-center p-2">
           <Text className="text-base-gray-2 text-xs leading-base font-bold">
-            {data.condition === "usado" ? "USADO" : "NOVO"}
+            {product.condition ? "Novo" : "Usado"}
           </Text>
         </View>
 
         <View className="flex-row justify-between mt-4">
-          <Text className="text-base-gray-1 text-lg font-bold leading-base">{data.title}</Text>
+          <Text className="text-base-gray-1 text-lg font-bold leading-base">{product.title}</Text>
 
           <View className="flex-row">
             <Text className="text-product-blue-light text-sm font-bold align-bottom">R$ </Text>
-            <Text className="text-product-blue-light text-lg font-bold">{data.price}</Text>
+            <Text className="text-product-blue-light text-lg font-bold">{product.price}</Text>
           </View>
         </View>
 
         <Text className="mt-5 text-base-gray-2 text-sm font-normal leading-base">
-          {data.description}
+          {product.description}
         </Text>
 
         <View className="flex-row gap-2 mt-2">
@@ -149,7 +129,7 @@ export default function PreviewAds() {
           </Text>
 
           <Text className="mt-5 text-base-gray-2 text-sm font-normal leading-base">
-            {data.acceptTrade ? "Sim" : "Não"}
+            {product.acceptTrade ? "Sim" : "Não"}
           </Text>
         </View>
 
@@ -158,7 +138,7 @@ export default function PreviewAds() {
             Meios de pagamento:
           </Text>
 
-          {data.paymentMethods?.map((method, index) => (
+          {product.paymentMethods?.map((method, index) => (
             <View key={index} className="flex-row items-center gap-2">
               {paymentIcons[method] ?? <Money />}
               <Text className="text-base-gray-2 text-sm font-normal leading-base">{method}</Text>
@@ -180,11 +160,11 @@ export default function PreviewAds() {
 
           <View className="w-[45%]">
             <Button
-              title="Publicar"
+              title={isEdit ? "Salvar alterações" : "Publicar"}
               color="primary"
               icon={<Tag size={20} color="#fff" />}
               isLoading={isLoading}
-              onPress={() => handleCreateAd(data)}
+              onPress={() => publishOrUpdateAd(product)}
             />
           </View>
         </View>
