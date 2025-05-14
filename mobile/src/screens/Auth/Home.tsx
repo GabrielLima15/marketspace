@@ -109,7 +109,7 @@ export default function Home() {
         Seus produtos anunciados para venda
       </Text>
 
-      <MyAdsSummaryCard numberOfAds={3} />
+      <MyAdsSummaryCard />
 
       <Text className="mt-10 text-base text-base-gray-3 font-karla font-normal leading-base">
         Compre produtos variados
