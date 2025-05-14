@@ -59,12 +59,7 @@ export type AppAuthStackRoutes = {
     }
   };
   editadsdetails: {
-    id: string
-    title: string
-    isUsed: boolean
-    price: string
-    image: string
-    isDisabled: boolean
+    product: ProductDTO;
   },
 };
 
