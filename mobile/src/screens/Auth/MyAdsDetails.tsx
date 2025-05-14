@@ -6,20 +6,36 @@ import { Bank, Barcode, CreditCard, Money, Power, QrCode, Trash, User } from "ph
 import Button from "@components/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Header from "@components/Header";
+import { api } from "@services/api";
+import { useContext } from "react";
+import { AuthContext } from "@contexts/AuthContext";
+import { getUserAvatarUrl } from "@utils/GetUserAvatar";
+import React from "react";
 
 export default function MyAdsDetails() {
   const route = useRoute<RouteProp<AppAuthStackRoutes, "myadsdetails">>();
-  const { product: { image, isDisabled, ...data }, user } = route.params;
-
-  const productImages = [image, image, image];
-
-  const avatar = user?.avatar
+  const { product } = route.params;
 
   const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
+  const { user } = useContext(AuthContext);
+
+  const productImages = product.product_images.map(
+    image => `${api.defaults.baseURL}/images/${image.path}`
+  );
+
+  const avatar = getUserAvatarUrl(user?.avatar);
 
   const handleEditAd = () => {
-    navigation.navigate("editadsdetails", { ...data });
-  }
+    navigation.navigate("editadsdetails", {
+      id: product.id,
+      title: product.name,
+      isUsed: !product.is_new,
+      price: (product.price / 100).toFixed(2),
+      image: `${api.defaults.baseURL}/images/${product.product_images[0]?.path}`,
+      isDisabled: !product.is_active
+    });
+  };
+
 
   return (
     <ScrollView className="flex-1 bg-base-gray-7">
@@ -32,7 +48,7 @@ export default function MyAdsDetails() {
           indicatorHeight={3}
         />
 
-        {isDisabled && (
+        {!product.is_active && (
           <>
             <View className="absolute top-0 left-0 right-0 bottom-0 bg-black/30 z-10 mt-4" />
             <View className="absolute top-0 left-0 right-0 bottom-0 justify-center items-center z-20">
@@ -46,33 +62,44 @@ export default function MyAdsDetails() {
 
       <View className="mx-4 mt-4">
         <View className="flex-row items-center gap-2">
-          {avatar ?
+          {avatar ? (
             <View className="border-[2px] border-product-blue-light rounded-full">
               <Image source={{ uri: avatar }} className="w-8 h-8 rounded-full" />
             </View>
-            :
+          ) : (
             <View className="border-[2px] border-product-blue-light rounded-full p-1">
               <User />
             </View>
-          }
-          <Text className="text-base-gray-1 text-sm font-normal leading-base">{user?.name}</Text>
+          )}
+          <Text className="text-base-gray-1 text-sm font-normal leading-base">
+            {user.name}
+          </Text>
         </View>
 
         <View className="bg-base-gray-5 rounded-full mt-8 w-14 h-w-14 items-center p-2">
-          <Text className="text-base-gray-2 text-xs leading-base font-bold">{data.isUsed ? "USADO" : "NOVO"}</Text>
+          <Text className="text-base-gray-2 text-xs leading-base font-bold">
+            {product.is_new ? "NOVO" : "USADO"}
+          </Text>
         </View>
 
         <View className="flex-row justify-between mt-4">
-          <Text className="text-base-gray-1 text-lg font-bold leading-base">{data.title}</Text>
+          <Text className="text-base-gray-1 text-lg font-bold leading-base">
+            {product.name}
+          </Text>
 
           <View className="flex-row">
             <Text className="text-product-blue-light text-sm font-bold align-bottom">R$ </Text>
-            <Text className="text-product-blue-light text-lg font-bold">{data.price}</Text>
+            <Text className="text-product-blue-light text-lg font-bold">
+              {(product.price / 100).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL"
+              })}
+            </Text>
           </View>
         </View>
 
         <Text className="mt-5 text-base-gray-2 text-sm font-normal leading-base">
-          Cras congue cursus in tortor sagittis placerat nunc, tellus arcu. Vitae ante leo eget maecenas urna mattis cursus. Mauris metus amet nibh mauris mauris accumsan, euismod. Aenean leo nunc, purus iaculis in aliquam.
+          {product.description}
         </Text>
 
         <View className="flex-row gap-2 mt-2">
@@ -81,7 +108,7 @@ export default function MyAdsDetails() {
           </Text>
 
           <Text className="mt-5 text-base-gray-2 text-sm font-normal leading-base">
-            Sim
+            {product.accept_trade ? "Sim" : "Não"}
           </Text>
         </View>
 
@@ -90,45 +117,33 @@ export default function MyAdsDetails() {
             Meios de pagamento:
           </Text>
 
-          <View className="flex-row items-center gap-2">
-            <Barcode />
-            <Text className="text-base-gray-2 text-sm font-normal leading-base">
-              Boleto
-            </Text>
-          </View>
-          <View className="flex-row items-center gap-2">
-            <QrCode />
-            <Text className="text-base-gray-2 text-sm font-normal leading-base">
-              Pix
-            </Text>
-          </View>
-          <View className="flex-row items-center gap-2">
-            <Money />
-            <Text className="text-base-gray-2 text-sm font-normal leading-base">
-              Dinheiro
-            </Text>
-          </View>
-          <View className="flex-row items-center gap-2">
-            <CreditCard />
-            <Text className="text-base-gray-2 text-sm font-normal leading-base">
-              Cartão de Crédito
-            </Text>
-          </View>
-          <View className="flex-row items-center gap-2">
-            <Bank />
-            <Text className="text-base-gray-2 text-sm font-normal leading-base">
-              Depósito Bancário
-            </Text>
-          </View>
-
+          {product.payment_methods.map(method => (
+            <View key={method.key} className="flex-row items-center gap-2">
+              {method.key === "boleto" && <Barcode />}
+              {method.key === "pix" && <QrCode />}
+              {method.key === "cash" && <Money />}
+              {method.key === "card" && <CreditCard />}
+              {method.key === "deposit" && <Bank />}
+              <Text className="text-base-gray-2 text-sm font-normal leading-base">
+                {method.name}
+              </Text>
+            </View>
+          ))}
         </View>
 
         <View className="flex-col gap-4 mt-4 mb-4 mx-3">
-          <Button icon={<Power size={20} color="#fff" />} title={isDisabled ? "Reativar anúncio" : "Desativar anúncio"} color={isDisabled ? "primary" : "dark"} />
-          <Button icon={<Trash size={20} color="#5F5B62" />} title="Excluir anúncio" color="gray" />
+          <Button
+            icon={<Power size={20} color="#fff" />}
+            title={product.is_active ? "Desativar anúncio" : "Reativar anúncio"}
+            color={product.is_active ? "dark" : "primary"}
+          />
+          <Button
+            icon={<Trash size={20} color="#5F5B62" />}
+            title="Excluir anúncio"
+            color="gray"
+          />
         </View>
       </View>
-
     </ScrollView>
   );
 }
