@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { NoAuthRoutes } from './app.no.auth.routes'
 import { AuthRoutes } from './app.auth.routes'
 import Loading from '@components/Loading'
+import Toast from 'react-native-toast-message'
 
 export default function AppRoutes() {
 
@@ -15,6 +16,7 @@ export default function AppRoutes() {
   return (
     <NavigationContainer>
       {user.id ? <AuthRoutes /> : <NoAuthRoutes />}
+      <Toast />
     </NavigationContainer>
   )
 }
