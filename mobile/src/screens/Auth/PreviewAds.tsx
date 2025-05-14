@@ -1,14 +1,17 @@
 import ImageCarousel from "@components/Carrousel";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { AppAuthStackRoutes } from "@routes/app.auth.routes";
+import { AppAuthBottomTabRoutes, AppAuthStackRoutes } from "@routes/app.auth.routes";
 import { Image, ScrollView, Text, View } from "react-native";
 import { ArrowLeft, Bank, Barcode, CreditCard, Money, QrCode, Tag, User } from "phosphor-react-native";
 import Button from "@components/Button";
 import { useAuth } from "@hooks/useAuth";
 import { useState } from "react";
-import { api } from "@services/api";
 import { getUserAvatarUrl } from "@utils/GetUserAvatar";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { uploadImages } from "@utils/UploadImages";
+import Toast from "react-native-toast-message";
+import { api } from "@services/api";
 
 const paymentIcons: any = {
   "Boleto": <Barcode />,
@@ -37,7 +40,6 @@ export default function PreviewAds() {
   const { data } = route.params;
 
   const { user } = useAuth()
-  console.log("🚀 ~ PreviewAds ~ user:", user)
 
   const avatarUrl = getUserAvatarUrl(user?.avatar);
 
@@ -45,10 +47,9 @@ export default function PreviewAds() {
   const productImages = data.images || [];
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
 
   const handleCreateAd = async (data: PropsData) => {
-    console.log("🚀 ~ handleCreateAd ~ data:", data);
 
     const paymentMethodMap: any = {
       "Boleto": "boleto",
@@ -59,7 +60,7 @@ export default function PreviewAds() {
     };
 
     try {
-      setIsLoading(true);
+      setIsLoading(true);      
 
       const response = await api.post('products', {
         name: data.title,
@@ -73,9 +74,20 @@ export default function PreviewAds() {
       const productId = response.data.id;
       await uploadImages({ images: data.images, productId });
 
-      console.log("✅ Imagens enviadas com sucesso!");
+      Toast.show({
+        type: 'success',
+        text1: 'Anúncio criado com sucesso!',
+      });
+
+      navigation.navigate('tabs', {
+        screen: 'myads',
+      });
+
     } catch (error) {
-      console.error(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao criar anúncio',
+      })
     } finally {
       setIsLoading(false);
     }
@@ -162,7 +174,7 @@ export default function PreviewAds() {
               title="Voltar e editar"
               color="gray"
               icon={<ArrowLeft size={20} color="#000" />}
-              onPress={() => navigate.goBack()}
+              onPress={() => navigation.goBack()}
             />
           </View>
 
