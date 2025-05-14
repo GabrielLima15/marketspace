@@ -16,13 +16,21 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { getImages } from "@utils/GetImages";
 import { ProductDTO } from "@dtos/ProductDTO";
 
+type ImageItem = {
+  uri: string;
+  id?: string;
+};
 
-
-export const adSchema = z.object({
+const adSchema = z.object({
   title: z.string().min(1, "Informe o título do anúncio"),
   description: z.string().min(1, "Informe a descrição do produto"),
   price: z.string().min(1, "Informe o preço"),
-  images: z.array(z.string()).min(1, "Adicione pelo menos 1 imagem").max(3, "Máximo de 3 imagens"),
+  images: z.array(
+    z.object({
+      uri: z.string().min(1),
+      id: z.string().optional()
+    })
+  ).min(1, "Adicione pelo menos 1 imagem").max(3, "Máximo de 3 imagens"),
   condition: z.enum(["novo", "usado"], {
     errorMap: () => ({ message: "Escolha a condição do produto" }),
   }),
@@ -64,14 +72,17 @@ export default function EditAdsDetails() {
       setSelectedOptions(product.payment_methods.map(m => m.name));
       setValue(
         "images",
-        product.product_images.map(img => getImages(img.path) || '')
+        product.product_images.map(img => ({
+          uri: getImages(img.path) || '',
+          id: img.id
+        }))
       );
     }
   }, [product, setValue]);
 
   const images = watch("images") || [];
 
-  function handleSetImages(newImages: string[]) {
+  function handleSetImages(newImages: ImageItem[]) {
     setValue("images", newImages);
   }
 
