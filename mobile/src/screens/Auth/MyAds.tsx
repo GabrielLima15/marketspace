@@ -1,128 +1,41 @@
 import CardsAds from "@components/CardsAds";
 import Header from "@components/Header";
 import Select from "@components/Select";
+import { useAuth } from "@hooks/useAuth";
+import { useProduct } from "@hooks/useProduct";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppAuthStackRoutes } from "@routes/app.auth.routes";
+import { api } from "@services/api";
 import { useState } from "react";
 import { FlatList, Text, View } from "react-native";
 
 export default function MyAds() {
-
   const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
   const [filter, setFilter] = useState<string | undefined>();
+  const { products } = useProduct();
+  const { user } = useAuth();
 
-
-  const allProducts = [
-    {
-      product: {
-        id: "1",
-        title: "Notebook Gamer",
-        isUsed: false,
-        price: "4.500,00",
-        image: "https://picsum.photos/id/180/600/400",
-        isDisabled: false
-      },
-      user: {
-        id: "1",
-        avatar: "https://github.com/gabriellima15.png",
-        name: "Gabriel Lima"
-      }
-    },
-    {
-      product: {
-        id: "2",
-        title: "Fone Over Ear",
-        isUsed: true,
-        price: "300,00",
-        image: "https://picsum.photos/id/237/600/400",
-        isDisabled: false
-      },
-      user: {
-        id: "2",
-        avatar: "https://github.com/gabriellima15.png",
-        name: "Gabriel Lima"
-      }
-    },
-    {
-      product: {
-        id: "3",
-        title: "Câmera DSLR Canon",
-        isUsed: true,
-        price: "2.000,00",
-        image: "https://picsum.photos/id/250/600/400",
-        isDisabled: false
-      },
-      user: {
-        id: "3",
-        avatar: "https://github.com/gabriellima15.png",
-        name: "Gabriel Lima"
-      }
-    },
-    {
-      product: {
-        id: "4",
-        title: "Tênis de Corrida Adidas",
-        isUsed: false,
-        price: "450,00",
-        image: "https://picsum.photos/id/1084/600/400",
-        isDisabled: false
-      },
-      user: {
-        id: "4",
-        avatar: "https://github.com/gabriellima15.png",
-        name: "Gabriel Lima"
-      }
-    },
-    {
-      product: {
-        id: "5",
-        title: "Relógio Digital Casio",
-        isUsed: true,
-        price: "120,00",
-        image: "https://picsum.photos/id/1027/600/400",
-        isDisabled: true
-      },
-      user: {
-        id: "5",
-        avatar: "https://github.com/gabriellima15.png",
-        name: "Gabriel Lima"
-      }
-    },
-    {
-      product: {
-        id: "6",
-        title: "Tablet Samsung Galaxy",
-        isUsed: false,
-        price: "1.800,00",
-        image: "https://picsum.photos/id/1074/600/400",
-        isDisabled: true
-      },
-      user: {
-        id: "6",
-        avatar: "https://github.com/gabriellima15.png",
-        name: "Gabriel Lima"
-      }
-    }
-  ];
-
-  const filteredProducts = allProducts.filter((item) => {
-    console.log("🚀 ~ filteredProducts ~ item:", item)
-    if (filter === "Ativos") return !item.product.isDisabled;
-    if (filter === "Inativos") return item.product.isDisabled;
+  const filteredProducts = products.filter((p) => {
+    if (filter === "Ativos") return p.is_active;
+    if (filter === "Inativos") return !p.is_active;
     return true;
   });
 
   return (
-    <View className="">
-      <Header onPress={
-        () => navigation.navigate("addads")
-      } addAds title="Meus anúncios" routeTitle />
+    <View>
+      <Header
+        onPress={() => navigation.navigate("addads")}
+        addAds
+        title="Meus anúncios"
+        routeTitle
+      />
 
       <View className="mx-8">
-
         <View className="flex-row items-center justify-between mt-8">
-          <Text className="text-base-gray-2 text-sm font-normal leading-base">{allProducts.length} anúncios</Text>
+          <Text className="text-base-gray-2 text-sm font-normal leading-base">
+            {filteredProducts.length} anúncios
+          </Text>
 
           <Select
             title="Todos"
@@ -138,20 +51,27 @@ export default function MyAds() {
           data={filteredProducts}
           renderItem={({ item }) => (
             <CardsAds
-              onPress={() =>
-                navigation.navigate("myadsdetails", {
-                  product: item.product,
-                  user: item.user
-                })
-              }
-              isDisabled={item.product.isDisabled}
-              key={item.product.id}
-              product={item.product}
-              user={item.user}
+              onPress={() => navigation.navigate("myadsdetails", { product: item })}
+              isDisabled={!item.is_active}
+              product={{
+                id: item.id,
+                title: item.name,
+                isUsed: !item.is_new,
+                price: (item.price / 100).toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }),
+                image: `${api.defaults.baseURL}/images/${item.product_images[0]?.path}`,
+              }}
+              user={{
+                id: user.id,
+                avatar: user.avatar,
+                name: user.name,
+              }}
               showAvatar={false}
             />
           )}
-          keyExtractor={item => item.product.id}
+          keyExtractor={item => item.id}
           numColumns={2}
           columnWrapperStyle={{ gap: 8 }}
           contentContainerStyle={{
@@ -162,5 +82,5 @@ export default function MyAds() {
         />
       </View>
     </View>
-  )
+  );
 }
