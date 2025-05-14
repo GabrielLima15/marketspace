@@ -68,7 +68,7 @@ export default function AddAds() {
   const paymentMethods = ["Boleto", "Pix", "Dinheiro", "Cartão de Crédito", "Depósito Bancário"];
 
   async function handleCreateAd(data: any) {
-    navigation.navigate("previewads", { data });
+    navigation.navigate("previewads", { product: data, isEdit: false });
   }
 
   return (
