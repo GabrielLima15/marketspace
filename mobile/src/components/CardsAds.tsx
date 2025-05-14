@@ -1,15 +1,18 @@
+import React from "react"
 import { Image, Text, TouchableOpacity, View } from "react-native"
 
 type Props = {
   product: {
-    title?: string
-    price?: string
+    id: string
+    title: string
+    price: string
     image?: string | null
     isUsed?: boolean
   },
   user: {
     id: string
     avatar?: string
+    name?: string
   }
   isDisabled?: boolean
   showAvatar?: boolean
