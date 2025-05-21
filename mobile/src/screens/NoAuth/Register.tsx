@@ -9,11 +9,10 @@ import Input from '@components/Input';
 import Button from '@components/Button';
 import UploadUserPhoto from '@components/UploadUserPhoto';
 import * as FileSystem from 'expo-file-system';
-import { api } from '@services/api';
-import axios, { AxiosError } from 'axios';
 import { NoAuthNavigatorRoutesProps } from '@routes/app.no.auth.routes';
 import { useAuth } from '@contexts/AuthContext';
 import Toast from 'react-native-toast-message';
+import { Create } from '@services/users';
 
 const registerSchema = z.object({
   avatar: z.any().optional(),
@@ -32,8 +31,6 @@ const registerSchema = z.object({
   }
 });
 
-
-
 type FormDataProps = z.infer<typeof registerSchema>;
 
 export default function Register() {
@@ -51,31 +48,22 @@ export default function Register() {
     try {
       setIsLoading(true);
 
-      const formData = new FormData();
-
+      let avatarUri = '';
+      
       if (data.avatar) {
         const fileInfo = await FileSystem.getInfoAsync(data.avatar);
         if (fileInfo.exists) {
-          const fileType = fileInfo.uri.split('.').pop();
-          formData.append('avatar', {
-            uri: data.avatar,
-            name: `avatar.${fileType}`,
-            type: `image/${fileType}`,
-          } as any);
+          avatarUri = data.avatar;
         }
       }
 
-      formData.append('name', data.name);
-      formData.append('email', data.email);
-      formData.append('tel', data.tel);
-      formData.append('password', data.password);
-
-      const response = await api.post('/users/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        transformRequest: (data) => data,
-      });
+      await Create(
+        avatarUri,
+        data.name,
+        data.email,
+        data.tel,
+        data.password
+      );
 
       await signIn(data.email, data.password);
 
@@ -85,7 +73,12 @@ export default function Register() {
       });
 
     } catch (error) {
-      console.error("❌ Erro ao registrar ou autenticar:", error)
+      console.error("❌ Erro ao registrar ou autenticar:", error);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao realizar cadastro',
+        text2: 'Por favor, tente novamente.'
+      });
     } finally {
       setIsLoading(false);
     }
