@@ -1,5 +1,6 @@
 import { UserDTO } from "@dtos/UserDTO";
 import { api } from "@services/api";
+import { Login } from "@services/sessions";
 import { ReadObject, SaveObject } from "@services/storage";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
@@ -44,7 +45,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   async function signIn(email: string, password: string) {
     try {
-      const { data } = await api.post('/sessions', { email, password })
+      const { data } = await Login(email, password)
 
       if (data.user && data.token && data.refresh_token) {
         await storageUserAndTokenSave(data.user, data.token, data.refresh_token)
