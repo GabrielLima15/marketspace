@@ -2,7 +2,7 @@ import CardsAds from "@components/CardsAds";
 import HeaderGroup from "@components/HeaderGroup";
 import MyAdsSummaryCard from "@components/MyAdsSummaryCard";
 import SearchFilter from "@components/SearchFilter";
-import { useProduct } from "@hooks/useProduct";
+import { useProduct } from "@contexts/ProductContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppAuthStackRoutes } from "@routes/app.auth.routes";

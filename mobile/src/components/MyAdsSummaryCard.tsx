@@ -1,4 +1,4 @@
-import { useProduct } from "@hooks/useProduct";
+import { useProduct } from "@contexts/ProductContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppAuthBottomTabRoutes } from "@routes/app.auth.routes";

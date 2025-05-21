@@ -2,7 +2,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 import { ProductDTO } from "@dtos/ProductDTO";
 import { api } from "@services/api";
 import { uploadImages } from "@utils/UploadImages";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "@contexts/AuthContext";
 import { ReadObject, SaveObject } from "@services/storage";
 
 const paymentMethodMap: Record<string, string> = {

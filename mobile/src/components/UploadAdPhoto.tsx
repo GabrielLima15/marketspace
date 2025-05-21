@@ -1,7 +1,7 @@
 import { Plus, X } from "phosphor-react-native";
 import { TouchableOpacity, View, Image } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
-import { useProduct } from "@hooks/useProduct";
+import { useProduct } from "@contexts/ProductContext";
 
 type ImageItem = {
   uri: string;

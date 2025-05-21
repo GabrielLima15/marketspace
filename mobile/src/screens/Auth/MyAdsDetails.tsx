@@ -10,8 +10,8 @@ import { api } from "@services/api";
 import { getUserAvatarUrl } from "@utils/GetUserAvatar";
 import React from "react";
 import Toast from "react-native-toast-message";
-import { useAuth } from "@hooks/useAuth";
-import { useProduct } from "@hooks/useProduct";
+import { useAuth } from "@contexts/AuthContext";
+import { useProduct } from "@contexts/ProductContext";
 
 export default function MyAdsDetails() {
   const route = useRoute<RouteProp<AppAuthStackRoutes, "myadsdetails">>();

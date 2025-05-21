@@ -1,4 +1,4 @@
-import { useAuth } from "@hooks/useAuth";
+import { useAuth } from "@contexts/AuthContext";
 import { getUserAvatarUrl } from "@utils/GetUserAvatar";
 import { User } from "phosphor-react-native";
 import { Image, View } from "react-native";

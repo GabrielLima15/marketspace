@@ -1,8 +1,8 @@
 import CardsAds from "@components/CardsAds";
 import Header from "@components/Header";
 import Select from "@components/Select";
-import { useAuth } from "@hooks/useAuth";
-import { useProduct } from "@hooks/useProduct";
+import { useAuth } from "@contexts/AuthContext";
+import { useProduct } from "@contexts/ProductContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppAuthStackRoutes } from "@routes/app.auth.routes";

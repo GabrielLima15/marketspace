@@ -4,12 +4,12 @@ import { AppAuthStackRoutes } from "@routes/app.auth.routes";
 import { Image, ScrollView, Text, View } from "react-native";
 import { ArrowLeft, Bank, Barcode, CreditCard, Money, QrCode, Tag, User } from "phosphor-react-native";
 import Button from "@components/Button";
-import { useAuth } from "@hooks/useAuth";
+import { useAuth } from "@contexts/AuthContext";
 import { useState } from "react";
 import { getUserAvatarUrl } from "@utils/GetUserAvatar";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Toast from "react-native-toast-message";
-import { useProduct } from "@hooks/useProduct";
+import { useProduct } from "@contexts/ProductContext";
 import { ProductDTO } from "@dtos/ProductDTO";
 
 const paymentIcons: any = {

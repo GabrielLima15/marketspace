@@ -1,4 +1,4 @@
-import { useAuth } from "@hooks/useAuth";
+import { useAuth } from "@contexts/AuthContext";
 import { Plus } from "phosphor-react-native";
 import { Text, View } from "react-native";
 import Button from "./Button";
