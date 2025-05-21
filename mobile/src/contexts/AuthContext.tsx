@@ -1,8 +1,7 @@
 import { UserDTO } from "@dtos/UserDTO";
 import { api } from "@services/api";
-import { storageAuthTokenGet, storageAuthTokenRemove, storageAuthTokenSave } from "@storage/storageAuthToken";
-import { storageUserGet, storageUserRemove, storageUserSave } from "@storage/storageUser";
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { ReadObject, SaveObject } from "@services/storage";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 export type AuthContextDataProps = {
   user: UserDTO
@@ -16,7 +15,7 @@ type AuthContextProviderProps = {
   children: ReactNode;
 }
 
-export const AuthContext = createContext<AuthContextDataProps>({} as AuthContextDataProps);
+const AuthContext = createContext<AuthContextDataProps>({} as AuthContextDataProps);
 
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
@@ -32,8 +31,9 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     try {
       setIsLoadingUserStorageData(true)
 
-      await storageUserSave(userData)
-      await storageAuthTokenSave({ token, refresh_token })
+      await SaveObject('user', userData)
+      await SaveObject('token', token)
+      await SaveObject('refresh_token', refresh_token)
     } catch (error) {
       throw error
     } finally {
@@ -61,8 +61,9 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     try {
       setIsLoadingUserStorageData(true)
       setUser({} as UserDTO)
-      await storageUserRemove()
-      await storageAuthTokenRemove()
+      await SaveObject('user', {})
+      await SaveObject('token', '')
+      await SaveObject('refresh_token', '')
 
     } catch (error) {
       throw error
@@ -74,7 +75,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   async function updateUserProfile(userUpdated: UserDTO) {
     try {
       setUser(userUpdated)
-      await storageUserSave(userUpdated)
+      await SaveObject('user', userUpdated)
 
     } catch (error) {
       throw error
@@ -85,8 +86,8 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     try {
       setIsLoadingUserStorageData(true)
 
-      const userLogged = await storageUserGet()
-      const { token } = await storageAuthTokenGet()
+      const userLogged = await ReadObject('user')
+      const { token } = await ReadObject('token')
 
       if (token && userLogged) {
         userAndTokenUpdate(userLogged, token)
@@ -123,3 +124,10 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     </AuthContext.Provider>
   )
 }
+
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+
+  return context
+}
+

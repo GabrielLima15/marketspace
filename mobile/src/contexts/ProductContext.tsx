@@ -1,9 +1,9 @@
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { ProductDTO } from "@dtos/ProductDTO";
 import { api } from "@services/api";
-import { storageProductsGet, storageProductsSave } from "@storage/storageProducts";
 import { uploadImages } from "@utils/UploadImages";
-import { useAuth } from "@hooks/useAuth";
+import { useAuth } from "./AuthContext";
+import { ReadObject, SaveObject } from "@services/storage";
 
 const paymentMethodMap: Record<string, string> = {
   "boleto": "boleto",
@@ -28,7 +28,7 @@ type ProductContextProviderProps = {
   children: ReactNode;
 }
 
-export const ProductContext = createContext<ProductContextDataProps>({} as ProductContextDataProps);
+const ProductContext = createContext<ProductContextDataProps>({} as ProductContextDataProps);
 
 export function ProductContextProvider({ children }: ProductContextProviderProps) {
   const [userProducts, setUserProducts] = useState<ProductDTO[]>([]);
@@ -41,7 +41,7 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
     try {
       const response = await api.get('/users/products');
       setUserProducts(response.data);
-      await storageProductsSave(response.data);
+      await SaveObject('products', response.data);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
     }
@@ -135,7 +135,7 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
 
   async function loadStoredUserProducts() {
     try {
-      const stored = await storageProductsGet();
+      const stored = await ReadObject('products');
       setUserProducts(stored);
     } catch (error) {
       console.error("Erro ao carregar produtos do storage:", error);
@@ -168,3 +168,11 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
     </ProductContext.Provider>
   );
 }
+
+export const useProduct = () => {
+  const context = useContext(ProductContext)
+
+  return context
+}
+
+
