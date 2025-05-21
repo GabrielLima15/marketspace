@@ -9,7 +9,7 @@ import { ScrollView, Text, View } from "react-native";
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { NoAuthNavigatorRoutesProps } from '@routes/app.no.auth.routes';
-import { useAuth } from '@hooks/useAuth';
+import { useAuth } from '@contexts/AuthContext';
 
 const loginSchema = z.object({
   email: z.string().min(5, { message: "Must be 5 or more characters long" }),

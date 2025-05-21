@@ -12,7 +12,7 @@ import * as FileSystem from 'expo-file-system';
 import { api } from '@services/api';
 import axios, { AxiosError } from 'axios';
 import { NoAuthNavigatorRoutesProps } from '@routes/app.no.auth.routes';
-import { useAuth } from '@hooks/useAuth';
+import { useAuth } from '@contexts/AuthContext';
 import Toast from 'react-native-toast-message';
 
 const registerSchema = z.object({
