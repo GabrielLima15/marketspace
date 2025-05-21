@@ -1,6 +1,6 @@
-import { storageAuthTokenGet, storageAuthTokenSave } from "@storage/storageAuthToken";
 import { AppError } from "@utils/AppError";
 import axios, { AxiosError, AxiosInstance } from "axios";
+import { ReadObject, SaveObject } from "./storage";
 
 type SignOut = () => void
 
@@ -24,7 +24,7 @@ api.registerInterceptTokenManager = signOut => {
   const interceptTokenManager = api.interceptors.response.use(response => response, async (requestError) => {
     if (requestError?.response?.status === 401) {
       if (requestError.response.data?.message === 'token.expired' || requestError.response.data?.message === 'token.invalid') {
-        const { refresh_token } = await storageAuthTokenGet()
+        const { refresh_token } = await ReadObject('refresh_token')
 
         if (!refresh_token) {
           signOut()
@@ -52,7 +52,8 @@ api.registerInterceptTokenManager = signOut => {
         return new Promise(async (resolve, reject) => {
           try {
             const { data } = await api.post('/sessions/refresh-token', { refresh_token })
-            await storageAuthTokenSave({ token: data.token, refresh_token: data.refresh_token })
+            await SaveObject('token', data.token)
+            await SaveObject('refresh_token', data.refresh_token)
 
             if (originalRequestConfig.data) {
               originalRequestConfig.data = JSON.parse(originalRequestConfig.data)
@@ -84,10 +85,6 @@ api.registerInterceptTokenManager = signOut => {
       signOut()
     }
 
-
-
-
-
     if (requestError.response && requestError.response.data) {
       return Promise.reject(new AppError(requestError?.response?.data?.message))
     } else {
@@ -98,7 +95,62 @@ api.registerInterceptTokenManager = signOut => {
   return () => {
     api.interceptors.response.eject(interceptTokenManager)
   }
+}
 
+// Funções HTTP
+export const GET = async (path: string, authenticated = false, p0?: { params: { is_new?: boolean; accept_trade?: boolean; payment_methods?: ("pix" | "card" | "boleto" | "cash" | "deposit")[]; query?: string; } | undefined; }) => {
+  const config = authenticated ? {
+    headers: {
+      'Authorization': `Bearer ${await ReadObject('token')}`
+    }
+  } : {}
+
+  const response = await api.get(path, config)
+  return response.data
+}
+
+export const POST = async (path: string, body: any, authenticated = false) => {
+  const config = authenticated ? {
+    headers: {
+      'Authorization': `Bearer ${await ReadObject('token')}`
+    }
+  } : {}
+
+  const response = await api.post(path, body, config)
+  return response.data
+}
+
+export const PUT = async (path: string, body: any, authenticated = false) => {
+  const config = authenticated ? {
+    headers: {
+      'Authorization': `Bearer ${await ReadObject('token')}`
+    }
+  } : {}
+
+  const response = await api.put(path, body, config)
+  return response.data
+}
+
+export const DELETE = async (path: string, authenticated = false) => {
+  const config = authenticated ? {
+    headers: {
+      'Authorization': `Bearer ${await ReadObject('token')}`
+    }
+  } : {}
+
+  const response = await api.delete(path, config)
+  return response.data
+}
+
+export const PATCH = async (path: string, body: any, authenticated = false) => {
+  const config = authenticated ? {
+    headers: {
+      'Authorization': `Bearer ${await ReadObject('token')}`
+    }
+  } : {}
+
+  const response = await api.patch(path, body, config)
+  return response.data
 }
 
 export { api }
