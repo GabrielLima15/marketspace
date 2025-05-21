@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Text, TextInput, TextInputProps, TouchableOpacity, View } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
+import { getMaskedValue } from "@utils/mask";
 
 type Props = TextInputProps & {
   isPasswordInput?: boolean;
@@ -21,9 +22,16 @@ export default function Input({
   ...rest
 }: Props) {
   const [showPass, setShowPass] = useState(false);
+  const [value, setValue] = useState(rest.value as string || '');
 
   function toggleShowPass() {
     setShowPass((prevState) => !prevState);
+  }
+
+  function handleChangeText(text: string) {
+    const maskedValue = getMaskedValue(text, { isMoneyInput, keyboardType: rest.keyboardType });
+    setValue(maskedValue);
+    rest.onChangeText?.(maskedValue);
   }
 
   return (
@@ -41,6 +49,8 @@ export default function Input({
           secureTextEntry={isPasswordInput ? !showPass : false}
           className={`pr-10 text-black ${isMoneyInput ? "mx-6" : null}`}
           placeholderTextColor="#9F9BA1"
+          value={value}
+          onChangeText={handleChangeText}
           {...rest}
         />
 
