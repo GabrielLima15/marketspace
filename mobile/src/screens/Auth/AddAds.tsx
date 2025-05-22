@@ -74,8 +74,15 @@ export default function AddAds() {
 
   const paymentMethods = ["Boleto", "Pix", "Dinheiro", "Cartão de Crédito", "Depósito Bancário"];
 
-  async function handleCreateAd(data: any) {
-    navigation.navigate("previewads", { product: data, isEdit: false });
+  async function handleCreateAd(data: FormData) {
+    const formattedPrice = data.price.replace('R$ ', '').replace('.', '').replace(',', '.');
+    
+    const formattedData = {
+      ...data,
+      price: formattedPrice,
+      images: data.images.map(img => img.uri)
+    };
+    navigation.navigate("previewads", { product: formattedData, isEdit: false });
   }
 
   return (
