@@ -2,13 +2,24 @@ import { GET, POST } from "./api";
 
 export const Create = async (avatar: string, name: string, email: string, tel: string, password: string) => {
     const formData = new FormData();
-    formData.append('avatar', avatar);
+    
+    if (avatar) {
+        const fileExtension = avatar.split('.').pop();
+        
+        formData.append('avatar', {
+            uri: avatar,
+            name: `avatar.${fileExtension}`,
+            type: `image/${fileExtension}`
+        } as any);
+    }
+    
     formData.append('name', name);
     formData.append('email', email);
     formData.append('tel', tel);
     formData.append('password', password);
+
     const response = await POST('/users', formData, true)
-    return response.data
+    return { data: response.data }
 }
 
 export const GetUser = async () => {
