@@ -13,10 +13,10 @@ import { FlatList, Text, View } from "react-native";
 export default function MyAds() {
   const navigation = useNavigation<NativeStackNavigationProp<AppAuthStackRoutes>>();
   const [filter, setFilter] = useState<string | undefined>();
-  const { products } = useProduct();
+  const { userProducts } = useProduct();
   const { user } = useAuth();
 
-  const filteredProducts = products.filter((p) => {
+  const filteredProducts = userProducts.filter((p) => {
     if (filter === "Ativos") return p.is_active;
     if (filter === "Inativos") return !p.is_active;
     return true;
