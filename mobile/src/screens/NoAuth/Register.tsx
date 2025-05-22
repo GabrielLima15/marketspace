@@ -15,7 +15,7 @@ import Toast from 'react-native-toast-message';
 import { Create } from '@services/users';
 
 const registerSchema = z.object({
-  avatar: z.any().optional(),
+  avatar: z.string().nonempty("A foto de perfil é obrigatória"),
   name: z.string().nonempty("Informe o nome").min(3, "O nome precisa ter pelo menos 3 caracteres"),
   email: z.string().nonempty("Informe o email").email("Email inválido"),
   tel: z.string().nonempty("Informe o telefone"),
@@ -57,6 +57,7 @@ export default function Register() {
         }
       }
 
+      // Primeiro criar o usuário
       await Create(
         avatarUri,
         data.name,
@@ -65,19 +66,24 @@ export default function Register() {
         data.password
       );
 
+      // Depois fazer login
       await signIn(data.email, data.password);
 
       Toast.show({
         type: 'success',
-        text1: 'Cadastro realizado com sucesso!',
+        text1: 'Bem-vindo ao Marketspace!',
+        text2: 'Cadastro realizado com sucesso.',
+        visibilityTime: 2000,
+        autoHide: true
       });
 
-    } catch (error) {
-      console.error("❌ Erro ao registrar ou autenticar:", error);
+    } catch (error: any) {
       Toast.show({
         type: 'error',
         text1: 'Erro ao realizar cadastro',
-        text2: 'Por favor, tente novamente.'
+        text2: error?.message || 'Por favor, tente novamente.',
+        visibilityTime: 4000,
+        autoHide: true
       });
     } finally {
       setIsLoading(false);
