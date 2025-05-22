@@ -136,9 +136,10 @@ export function ProductContextProvider({ children }: ProductContextProviderProps
   async function loadStoredUserProducts() {
     try {
       const stored = await ReadObject('products');
-      setUserProducts(stored);
+      setUserProducts(stored || []);
     } catch (error) {
       console.error("Erro ao carregar produtos do storage:", error);
+      setUserProducts([]);
     }
   }
 
