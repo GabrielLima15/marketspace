@@ -11,8 +11,7 @@ import AddAds from "@screens/Auth/AddAds";
 import PreviewAds from "@screens/Auth/PreviewAds";
 import EditAdsDetails from "@screens/Auth/EditAdsDetails";
 import { TouchableOpacity } from "react-native";
-import { AuthContext } from "@contexts/AuthContext";
-import { useContext } from "react";
+import { useAuth } from "@contexts/AuthContext";
 import { ProductDTO } from "@dtos/ProductDTO";
 
 // Tabs
@@ -64,9 +63,7 @@ const Tab = createBottomTabNavigator<AppAuthBottomTabRoutes>();
 const Stack = createNativeStackNavigator<AppAuthStackRoutes>();
 
 function BottomTabs() {
-
-  const { signOut } = useContext(AuthContext);
-
+  const { signOut } = useAuth();
 
   return (
     <Tab.Navigator
@@ -95,7 +92,7 @@ function BottomTabs() {
         options={{
           tabBarButton: () => (
             <TouchableOpacity
-              onPress={async () => await signOut()}
+              onPress={signOut}
               style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
             >
               <SignOut size={24} color="red" />
