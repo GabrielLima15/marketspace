@@ -1,6 +1,7 @@
 import { AppError } from "@utils/AppError";
 import axios, { AxiosError, AxiosInstance } from "axios";
 import { ReadObject, SaveObject } from "./storage";
+import { RefreshToken } from "./sessions";
 
 type SignOut = () => void
 
@@ -14,7 +15,12 @@ type APIInstanceProps = AxiosInstance & {
 }
 
 const api = axios.create({
-  baseURL: 'http://10.0.2.2:3333'
+  baseURL: 'http://10.0.2.2:3333',
+  timeout: 10000,
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  }
 }) as APIInstanceProps
 
 let failedQueue: Array<PromiseType> = []
@@ -51,7 +57,7 @@ api.registerInterceptTokenManager = signOut => {
 
         return new Promise(async (resolve, reject) => {
           try {
-            const { data } = await api.post('/sessions/refresh-token', { refresh_token })
+            const { data } = await RefreshToken(refresh_token)
             await SaveObject('token', data.token)
             await SaveObject('refresh_token', data.refresh_token)
 
@@ -110,14 +116,18 @@ export const GET = async (path: string, authenticated = false, p0?: { params: { 
 }
 
 export const POST = async (path: string, body: any, authenticated = false) => {
-  const config = authenticated ? {
+  const config = {
     headers: {
-      'Authorization': `Bearer ${await ReadObject('token')}`
+      ...(authenticated ? { 'Authorization': `Bearer ${await ReadObject('token')}` } : {}),
+      ...(body instanceof FormData 
+        ? { 'Content-Type': 'multipart/form-data' }
+        : { 'Content-Type': 'application/json' }
+      )
     }
-  } : {}
+  }
 
   const response = await api.post(path, body, config)
-  return response.data
+  return response
 }
 
 export const PUT = async (path: string, body: any, authenticated = false) => {
