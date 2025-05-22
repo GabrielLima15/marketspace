@@ -45,11 +45,12 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   async function signIn(email: string, password: string) {
     try {
+      setIsLoadingUserStorageData(true)
       const { data } = await Login(email, password)
 
       if (data.user && data.token && data.refresh_token) {
         await storageUserAndTokenSave(data.user, data.token, data.refresh_token)
-        userAndTokenUpdate(data.user, data.token)
+        await userAndTokenUpdate(data.user, data.token)
       }
     } catch (error) {
       throw error
