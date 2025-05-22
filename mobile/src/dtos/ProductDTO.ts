@@ -11,6 +11,10 @@ export type ProductDTO = {
   updated_at: string;
   product_images: Productimage[];
   payment_methods: Paymentmethod[];
+  user?: {
+    avatar?: string;
+    name?: string;
+  };
 }
 
 interface Paymentmethod {
