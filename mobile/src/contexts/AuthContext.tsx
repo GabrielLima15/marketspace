@@ -35,12 +35,13 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       await SaveObject('user', userData)
       await SaveObject('token', token)
       await SaveObject('refresh_token', refresh_token)
+
+      console.log('Token saved:', token)
     } catch (error) {
       throw error
     } finally {
       setIsLoadingUserStorageData(false)
     }
-
   }
 
   async function signIn(email: string, password: string) {
@@ -89,7 +90,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       setIsLoadingUserStorageData(true)
 
       const userLogged = await ReadObject('user')
-      const { token } = await ReadObject('token')
+      const token = await ReadObject('token')
 
       if (token && userLogged) {
         userAndTokenUpdate(userLogged, token)
