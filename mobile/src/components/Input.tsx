@@ -19,10 +19,11 @@ export default function Input({
   errorMessage = null,
   isTextArea = false,
   isMoneyInput = false,
+  value,
+  onChangeText,
   ...rest
 }: Props) {
   const [showPass, setShowPass] = useState(false);
-  const [value, setValue] = useState(rest.value as string || '');
 
   function toggleShowPass() {
     setShowPass((prevState) => !prevState);
@@ -30,8 +31,9 @@ export default function Input({
 
   function handleChangeText(text: string) {
     const maskedValue = getMaskedValue(text, { isMoneyInput, keyboardType: rest.keyboardType });
-    setValue(maskedValue);
-    rest.onChangeText?.(maskedValue);
+    if (onChangeText) {
+      onChangeText(maskedValue);
+    }
   }
 
   return (
