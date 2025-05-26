@@ -31,3 +31,7 @@ export function getMaskedValue(value: string, props: {
 
   return value;
 }
+
+export function formatToReal(value: number){
+  return value.toFixed(2).replace('.', ',');
+}
