@@ -11,6 +11,7 @@ import { getUserAvatarUrl } from "@utils/GetUserAvatar";
 import { useCallback, useEffect, useState } from "react";
 import { FlatList, Text, View } from "react-native";
 import { Read } from "@services/products";
+import { formatToReal } from "@utils/mask";
 
 type PaymentMethod = "pix" | "card" | "boleto" | "cash" | "deposit";
 
@@ -142,8 +143,9 @@ export default function Home() {
                       id: item.id,
                       title: item.name,
                       isUsed: !item.is_new,
-                      price: (item.price / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                      price: formatToReal(item.price),
                       image: getImages(item.product_images[0]?.path || '') || '',
+                      description: item.description,
                       user: {
                         id: item.user_id,
                         avatar: getUserAvatarUrl(item.user?.avatar || '') || undefined,
@@ -156,7 +158,7 @@ export default function Home() {
                   id: item.id,
                   title: item.name,
                   isUsed: !item.is_new,
-                  price: (item.price / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                  price: formatToReal(item.price),
                   image: getImages(item.product_images[0]?.path || '') || ''
                 }}
                 user={{
