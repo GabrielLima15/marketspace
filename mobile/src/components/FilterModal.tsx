@@ -13,14 +13,28 @@ export type PaymentMethods = {
   deposito: boolean;
 }
 
-export default function FilterModal() {
+type Props = {
+  onApplyFilters: (filters: {
+    is_new?: boolean;
+    accept_trade?: boolean;
+    payment_methods: string[];
+  }) => void;
+}
+
+const paymentMethodsMap: Record<string, string> = {
+  "boleto": "boleto",
+  "pix": "pix",
+  "dinheiro": "cash",
+  "cartao": "card",
+  "deposito": "deposit"
+};
+
+export default function FilterModal({ onApplyFilters }: Props) {
   const modalizeRef = useRef<Modalize>(null);
 
-  const [selected, setSelected] = useState<"NOVO" | "USADO" | null>("NOVO");
-  const [isEnabled, setIsEnabled] = useState(false);
+  const [selected, setSelected] = useState<"NOVO" | "USADO" | null>(null);
+  const [acceptTrade, setAcceptTrade] = useState<boolean | null>(null);
   const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<string[]>([]);
-
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
   const handleSelect = (condition: "NOVO" | "USADO") => {
     setSelected(prev => (prev === condition ? null : condition));
@@ -38,12 +52,41 @@ export default function FilterModal() {
 
   const resetFilters = () => {
     setSelected(null);
-    setIsEnabled(false);
+    setAcceptTrade(null);
     setSelectedPaymentMethods([]);
+    
+    onApplyFilters({
+      is_new: undefined,
+      accept_trade: undefined,
+      payment_methods: []
+    });
+    
+    modalizeRef.current?.close();
   };
 
   const onOpen = () => {
     modalizeRef.current?.open();
+  };
+
+  const handleApplyFilters = () => {
+    const filters: {
+      is_new?: boolean;
+      accept_trade?: boolean;
+      payment_methods: string[];
+    } = {
+      payment_methods: selectedPaymentMethods.map(method => paymentMethodsMap[method])
+    };
+
+    if (selected !== null) {
+      filters.is_new = selected === "NOVO";
+    }
+
+    if (acceptTrade !== null) {
+      filters.accept_trade = acceptTrade;
+    }
+
+    onApplyFilters(filters);
+    modalizeRef.current?.close();
   };
 
   return (
@@ -114,8 +157,8 @@ export default function FilterModal() {
               <Switch
                 trackColor={{ false: '#D9D8DA', true: '#647AC7' }}
                 thumbColor={'#F7F7F8'}
-                onValueChange={toggleSwitch}
-                value={isEnabled}
+                onValueChange={(value) => setAcceptTrade(value)}
+                value={acceptTrade === null ? false : acceptTrade}
               />
             </View>
 
@@ -166,6 +209,7 @@ export default function FilterModal() {
               </TouchableOpacity>
 
               <TouchableOpacity 
+                onPress={handleApplyFilters}
                 className="flex-1 h-10 rounded-md bg-base-gray-1 items-center justify-center"
               >
                 <Text className="text-base-gray-7 text-sm font-bold">Aplicar filtros</Text>
