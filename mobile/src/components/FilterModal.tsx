@@ -3,16 +3,43 @@ import { useRef, useState } from "react";
 import { Switch, Text, TouchableOpacity, View } from "react-native";
 import { Modalize } from "react-native-modalize";
 import { Portal } from "react-native-portalize";
+import CheckBox from "./CheckBox";
+
+export type PaymentMethods = {
+  boleto: boolean;
+  pix: boolean;
+  dinheiro: boolean;
+  cartao: boolean;
+  deposito: boolean;
+}
 
 export default function FilterModal() {
   const modalizeRef = useRef<Modalize>(null);
 
   const [selected, setSelected] = useState<"NOVO" | "USADO" | null>("NOVO");
   const [isEnabled, setIsEnabled] = useState(false);
+  const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<string[]>([]);
+
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
   const handleSelect = (condition: "NOVO" | "USADO") => {
     setSelected(prev => (prev === condition ? null : condition));
+  };
+
+  const handlePaymentMethod = (value: string) => {
+    setSelectedPaymentMethods(prev => {
+      if (prev.includes(value)) {
+        return prev.filter(method => method !== value);
+      } else {
+        return [...prev, value];
+      }
+    });
+  };
+
+  const resetFilters = () => {
+    setSelected(null);
+    setIsEnabled(false);
+    setSelectedPaymentMethods([]);
   };
 
   const onOpen = () => {
@@ -44,7 +71,6 @@ export default function FilterModal() {
             <Text className="text-base-gray-2 font-bold text-sm leading-base mt-8">Condição</Text>
 
             <View className="flex-row items-center gap-2 mt-4">
-
               <TouchableOpacity
                 onPress={() => handleSelect("NOVO")}
                 className={`px-4 py-2 rounded-full flex-row items-center gap-2 border 
@@ -83,21 +109,70 @@ export default function FilterModal() {
               </TouchableOpacity>
             </View>
 
-
-
             <Text className="text-base-gray-2 font-bold text-sm leading-base mt-8">Aceita troca?</Text>
-            <View className="flex-row">
+            <View className="flex-row mt-3">
               <Switch
-                trackColor={{ false: '#767577', true: '#81b0ff' }}
-                thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+                trackColor={{ false: '#D9D8DA', true: '#647AC7' }}
+                thumbColor={'#F7F7F8'}
                 onValueChange={toggleSwitch}
                 value={isEnabled}
               />
+            </View>
 
+            <Text className="text-base-gray-2 font-bold text-sm leading-base mt-8">Meios de pagamento aceitos</Text>
+            <View className="mt-3 gap-y-2">
+              <CheckBox 
+                label="Boleto"
+                value="boleto"
+                selectedValues={selectedPaymentMethods}
+                onSelect={handlePaymentMethod}
+              />
+
+              <CheckBox 
+                label="Pix"
+                value="pix"
+                selectedValues={selectedPaymentMethods}
+                onSelect={handlePaymentMethod}
+              />
+
+              <CheckBox 
+                label="Dinheiro"
+                value="dinheiro"
+                selectedValues={selectedPaymentMethods}
+                onSelect={handlePaymentMethod}
+              />
+
+              <CheckBox 
+                label="Cartão de Crédito"
+                value="cartao"
+                selectedValues={selectedPaymentMethods}
+                onSelect={handlePaymentMethod}
+              />
+
+              <CheckBox 
+                label="Depósito Bancário"
+                value="deposito"
+                selectedValues={selectedPaymentMethods}
+                onSelect={handlePaymentMethod}
+              />
+            </View>
+
+            <View className="flex-row gap-x-3 absolute -bottom-40">
+              <TouchableOpacity 
+                onPress={resetFilters}
+                className="flex-1 h-10 rounded-md bg-base-gray-5 items-center justify-center"
+              >
+                <Text className="text-base-gray-2 text-sm font-bold">Resetar filtros</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                className="flex-1 h-10 rounded-md bg-base-gray-1 items-center justify-center"
+              >
+                <Text className="text-base-gray-7 text-sm font-bold">Aplicar filtros</Text>
+              </TouchableOpacity>
             </View>
 
           </View>
-
         </Modalize>
       </Portal>
     </View>
