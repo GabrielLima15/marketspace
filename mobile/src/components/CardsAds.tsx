@@ -37,9 +37,9 @@ export default function CardsAds({ product: { title, price, image, isUsed, }, sh
 
           {isDisabled && (
             <>
-              <View className="absolute top-0 left-0 right-0 bottom-0 bg-black/25 h-32 mt-4 z-10" />
+              <View className="absolute top-0 left-0 right-0 bottom-0 bg-black/25 mt-3 mb-3 z-10" />
 
-              <View className="absolute left-0 right-10 top-[7.5rem] justify-center items-center z-20">
+              <View className="absolute w-full left-0 right-10 top-[7.5rem] justify-center items-center z-20">
                 <Text className="text-white font-bold text-sm">
                   ANÚNCIO DESATIVADO
                 </Text>
