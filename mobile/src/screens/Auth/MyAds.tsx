@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppAuthStackRoutes } from "@routes/app.auth.routes";
 import { api } from "@services/api";
+import { formatToReal } from "@utils/mask";
 import { useState } from "react";
 import { FlatList, Text, View } from "react-native";
 
@@ -57,10 +58,7 @@ export default function MyAds() {
                 id: item.id,
                 title: item.name,
                 isUsed: !item.is_new,
-                price: (item.price / 100).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }),
+                price: formatToReal(item.price),
                 image: `${api.defaults.baseURL}/images/${item.product_images[0]?.path}`,
               }}
               user={{
