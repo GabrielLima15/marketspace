@@ -108,11 +108,12 @@ export const GET = async (path: string, authenticated = false, p0?: { params: { 
   const config = authenticated ? {
     headers: {
       'Authorization': `Bearer ${await ReadObject('token')}`
-    }
-  } : {}
+    },
+    ...p0
+  } : p0 || {}
 
   const response = await api.get(path, config)
-  return response.data
+  return response
 }
 
 export const POST = async (path: string, body: any, authenticated = false) => {
