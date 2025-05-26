@@ -31,6 +31,7 @@ export type AppAuthStackRoutes = {
       isUsed: boolean;
       price: string;
       image: string;
+      description: string;
       user: {
         id: string;
         avatar?: string;
