@@ -12,6 +12,7 @@ import React from "react";
 import Toast from "react-native-toast-message";
 import { useAuth } from "@contexts/AuthContext";
 import { useProduct } from "@contexts/ProductContext";
+import { formatToReal } from "@utils/mask";
 
 export default function MyAdsDetails() {
   const route = useRoute<RouteProp<AppAuthStackRoutes, "myadsdetails">>();
@@ -123,10 +124,7 @@ export default function MyAdsDetails() {
           <View className="flex-row">
             <Text className="text-product-blue-light text-sm font-bold align-bottom">R$ </Text>
             <Text className="text-product-blue-light text-lg font-bold">
-              {(product.price / 100).toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL"
-              })}
+              {formatToReal(product.price)}
             </Text>
           </View>
         </View>
