@@ -40,7 +40,7 @@ export default function AdDetails() {
           <Text className="text-base-gray-1 text-sm font-normal leading-base">{user?.name}</Text>
         </View>
 
-        <View className="bg-base-gray-5 rounded-full mt-8 w-14 h-w-14 items-center p-2">
+        <View className="bg-base-gray-5 rounded-full mt-8 w-20 h-w-14 items-center p-2">
           <Text className="text-base-gray-2 text-xs leading-base font-bold">{data.isUsed ? "USADO" : "NOVO"}</Text>
         </View>
 
@@ -54,7 +54,7 @@ export default function AdDetails() {
         </View>
 
         <Text className="mt-5 text-base-gray-2 text-sm font-normal leading-base">
-          Cras congue cursus in tortor sagittis placerat nunc, tellus arcu. Vitae ante leo eget maecenas urna mattis cursus. Mauris metus amet nibh mauris mauris accumsan, euismod. Aenean leo nunc, purus iaculis in aliquam.
+          {data.description ? data.description : 'Não há descrição para este produto'}
         </Text>
 
         <View className="flex-row gap-2 mt-2">
