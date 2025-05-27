@@ -1,5 +1,8 @@
 # Marketspace
 
+![alt text](Cover.png)
+
+
 O **Marketspace** é uma aplicação completa para compra e venda de produtos, composta por:
 
 - **API (Back-end)**: gerenciamento de usuários, produtos e imagens.
